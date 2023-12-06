@@ -280,6 +280,20 @@ struct Example :
 
     /////////////// Custom Nodes /////////////////
 
+    Node* SpawnAnimalVarNode()
+    {
+        m_Nodes.emplace_back(GetNextId(), "Animal Variable");
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "ID", PinType::String);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Blend Op", PinType::Function);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Clip Ctrl", PinType::Flow);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Hierarchy Pose Group", PinType::Bool);
+        m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output", PinType::Flow);
+
+        BuildNode(&m_Nodes.back());
+
+        return &m_Nodes.back();
+    }
+
     Node* SpawnClipCtrlNode()
     {
         m_Nodes.emplace_back(GetNextId(), "Evaluate Clip Controller");
@@ -1687,6 +1701,8 @@ struct Example :
             Node* node = nullptr;
             if (ImGui::MenuItem("Blend Tree Node"))
                 node = SpawnClipCtrlNode();
+            if (ImGui::MenuItem("Animal Variable"))
+                node = SpawnAnimalVarNode();
             if (ImGui::MenuItem("Input Action"))
                 node = SpawnInputActionNode();
             if (ImGui::MenuItem("Output Action"))
