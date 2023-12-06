@@ -133,7 +133,7 @@ struct Pin
     std::string Name;
     PinType     Type;
     PinKind     Kind;
-    std::string VarName; //Dirty, used to store name of variable if it is a dropdown type
+    std::string data; //Dirty, used to store name of animal variable if it is a dropdown type pin or the string value if it is a string type pin
 
     Pin(int id, const char* name, PinType type) :
         ID(id), Node(nullptr), Name(name), Type(type), Kind(PinKind::Input)
@@ -1110,13 +1110,13 @@ struct Example :
                         ImGui::SetNextItemWidth(combo_width);
 
                         //Create combo box
-                        if (ImGui::BeginCombo("", input.VarName.c_str()))
+                        if (ImGui::BeginCombo("", input.data.c_str()))
                         {
                             for (int n = 0; n < IM_ARRAYSIZE(ANIMAL_VAR_NAMES); n++)
                             {
-                                bool is_selected = !strcmp(input.VarName.c_str(), ANIMAL_VAR_NAMES[n].c_str());
+                                bool is_selected = !strcmp(input.data.c_str(), ANIMAL_VAR_NAMES[n].c_str());
                                 if (ImGui::Selectable(ANIMAL_VAR_NAMES[n].c_str(), is_selected))
-                                    input.VarName = ANIMAL_VAR_NAMES[n];
+                                    input.data = ANIMAL_VAR_NAMES[n];
                                 if (is_selected)
                                     ImGui::SetItemDefaultFocus();
                             }
@@ -1131,11 +1131,14 @@ struct Example :
 
                     if (input.Type == PinType::String && !IsPinLinked(input.ID)) //String pin
                     {
-                        static char buffer[128] = "Edit Me\nMultiline!";
-                        static bool wasActive = false;
+                        //Adapted from output pin in the section below
+                        bool wasActive = false;
 
                         ImGui::PushItemWidth(100.0f);
-                        ImGui::InputText("##edit", buffer, 127);
+                        char* cstr = new char[input.data.length() + 1];
+                        strcpy(cstr, input.data.c_str());
+                        ImGui::InputText("##edit", cstr, 127);
+                        input.data = cstr;
                         ImGui::PopItemWidth();
                         if (ImGui::IsItemActive() && !wasActive)
                         {
