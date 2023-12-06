@@ -49,6 +49,32 @@ static ed::EditorContext* m_Editor = nullptr;
 //        return false;
 //}
 
+enum class AnimalVar
+{
+    animal_var_hierarchyPoseGroup_skel,
+
+    animal_var_jumpClipCtrl,
+    animal_var_idleClipCtrl,
+    animal_var_walkClipCtrl,
+    animal_var_runClipCtrl,
+
+    animal_var_ctrlVelocityMagnitude,
+    animal_var_idleBlendThreshold,
+    animal_var_walkBlendThreshold,
+    animal_var_runBlendThreshold,
+
+    animal_var_jumpLerpParam,
+    animal_var_jumpDuration,
+    animal_var_jumpHeight,
+    animal_var_jumpFadeInTime,
+    animal_var_jumpFadeOutTime,
+    animal_var_timeSinceJump,
+    animal_var_isJumping,
+    animal_var_ctrlNode,
+
+    animal_var_max
+};
+
 enum class PinType
 {
     Flow,
@@ -283,11 +309,7 @@ struct Example :
     Node* SpawnAnimalVarNode()
     {
         m_Nodes.emplace_back(GetNextId(), "Animal Variable");
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "ID", PinType::String);
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Blend Op", PinType::Function);
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Clip Ctrl", PinType::Flow);
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Hierarchy Pose Group", PinType::Bool);
-        m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output", PinType::Flow);
+        m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output", PinType::Object);
 
         BuildNode(&m_Nodes.back());
 
@@ -298,10 +320,27 @@ struct Example :
     {
         m_Nodes.emplace_back(GetNextId(), "Evaluate Clip Controller");
         m_Nodes.back().Inputs.emplace_back(GetNextId(), "ID", PinType::String);
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Blend Op", PinType::Function);
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Clip Ctrl", PinType::Flow);
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Hierarchy Pose Group", PinType::Bool);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Clip Ctrl", PinType::Object);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Hierarchy Pose Group", PinType::Object);
         m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output", PinType::Flow);
+
+        BuildNode(&m_Nodes.back());
+
+        return &m_Nodes.back();
+    }
+
+    Node* SpawnBlend3Node()
+    {
+        m_Nodes.emplace_back(GetNextId(), "Blend 3");
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "ID", PinType::String);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Magnitude", PinType::Object);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Threshold 1", PinType::Object);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Threshold 2", PinType::Object);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Threshold 3", PinType::Object);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input 1", PinType::Flow);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input 2", PinType::Flow);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input 3", PinType::Flow);
+        m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output Pose", PinType::Flow);
 
         BuildNode(&m_Nodes.back());
 
@@ -1699,7 +1738,9 @@ struct Example :
             //drawList->AddCircleFilled(ImGui::GetMousePosOnOpeningCurrentPopup(), 10.0f, 0xFFFF00FF);
 
             Node* node = nullptr;
-            if (ImGui::MenuItem("Blend Tree Node"))
+            if (ImGui::MenuItem("Blend 3 Node"))
+                node = SpawnBlend3Node();
+            if (ImGui::MenuItem("Evaluate Clip Ctrl Node"))
                 node = SpawnClipCtrlNode();
             if (ImGui::MenuItem("Animal Variable"))
                 node = SpawnAnimalVarNode();
