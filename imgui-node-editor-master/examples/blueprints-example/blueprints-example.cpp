@@ -75,6 +75,27 @@ enum class AnimalVar
     animal_var_max
 };
 
+const std::string ANIMAL_VAR_NAMES[] =
+{
+    "hierarchyPoseGroup_skel",
+    "jumpClipCtrl",
+    "idleClipCtrl",
+    "walkClipCtrl",
+    "runClipCtrl",
+    "ctrlVelocityMagnitude",
+    "idleBlendThreshold",
+    "walkBlendThreshold",
+    "runBlendThreshold",
+    "jumpLerpParam",
+    "jumpDuration",
+    "jumpHeight",
+    "jumpFadeInTime",
+    "jumpFadeOutTime",
+    "timeSinceJump",
+    "isJumping",
+    "ctrlNode"
+};
+
 enum class PinType
 {
     Flow,
@@ -85,6 +106,7 @@ enum class PinType
     Object,
     Function,
     Delegate,
+    Dropdown
 };
 
 enum class PinKind
@@ -111,6 +133,7 @@ struct Pin
     std::string Name;
     PinType     Type;
     PinKind     Kind;
+    std::string VarName; //Dirty, used to store name of variable if it is a dropdown type
 
     Pin(int id, const char* name, PinType type) :
         ID(id), Node(nullptr), Name(name), Type(type), Kind(PinKind::Input)
@@ -267,7 +290,7 @@ struct Example :
 
     bool CanCreateLink(Pin* a, Pin* b)
     {
-        if (!a || !b || a == b || a->Kind == b->Kind || a->Type != b->Type || a->Node == b->Node)
+        if (!a || !b || a->Type == PinType::Dropdown || b->Type == PinType::Dropdown || a == b || a->Kind == b->Kind || a->Type != b->Type || a->Node == b->Node)
             return false;
 
         return true;
@@ -306,22 +329,14 @@ struct Example :
 
     /////////////// Custom Nodes /////////////////
 
-    Node* SpawnAnimalVarNode()
-    {
-        m_Nodes.emplace_back(GetNextId(), "Animal Variable");
-        m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output", PinType::Object);
-
-        BuildNode(&m_Nodes.back());
-
-        return &m_Nodes.back();
-    }
-
     Node* SpawnClipCtrlNode()
     {
         m_Nodes.emplace_back(GetNextId(), "Evaluate Clip Controller");
         m_Nodes.back().Inputs.emplace_back(GetNextId(), "ID", PinType::String);
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Clip Ctrl", PinType::Object);
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Hierarchy Pose Group", PinType::Object);
+        /*m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Clip Ctrl", PinType::Object);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Hierarchy Pose Group", PinType::Object);*/
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Clip Ctrl", PinType::Dropdown);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Hierarchy Pose Group", PinType::Dropdown);
         m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output", PinType::Flow);
 
         BuildNode(&m_Nodes.back());
@@ -333,10 +348,10 @@ struct Example :
     {
         m_Nodes.emplace_back(GetNextId(), "Blend 3");
         m_Nodes.back().Inputs.emplace_back(GetNextId(), "ID", PinType::String);
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Magnitude", PinType::Object);
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Threshold 1", PinType::Object);
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Threshold 2", PinType::Object);
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Threshold 3", PinType::Object);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Magnitude", PinType::Dropdown);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Threshold 1", PinType::Dropdown);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Threshold 2", PinType::Dropdown);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Threshold 3", PinType::Dropdown);
         m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input 1", PinType::Flow);
         m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input 2", PinType::Flow);
         m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input 3", PinType::Flow);
@@ -671,6 +686,7 @@ struct Example :
         case PinType::Object:   return ImColor(51, 150, 215);
         case PinType::Function: return ImColor(218, 0, 183);
         case PinType::Delegate: return ImColor(255, 48, 48);
+        case PinType::Dropdown: return ImColor(100, 100, 100);
         }
     };
 
@@ -1045,7 +1061,8 @@ struct Example :
                                 ImGui::TextUnformatted(output.Name.c_str());
                                 ImGui::Spring(0);
                             }
-                            DrawPinIcon(output, IsPinLinked(output.ID), (int)(alpha * 255));
+                            if(output.Type != PinType::Dropdown)
+                                DrawPinIcon(output, IsPinLinked(output.ID), (int)(alpha * 255));
                             ImGui::Spring(0, ImGui::GetStyle().ItemSpacing.x / 2);
                             ImGui::EndHorizontal();
                             ImGui::PopStyleVar();
@@ -1070,7 +1087,69 @@ struct Example :
 
                     builder.Input(input.ID);
                     ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
-                    DrawPinIcon(input, IsPinLinked(input.ID), (int)(alpha * 255));
+
+                    /////////////////////// Dropdown Menus //////////////////////////////////
+                    //Dillon Drummond
+                    if (input.Type == PinType::Dropdown) //Dropdown pin
+                    {
+                        // Find the longest animal var name
+                        std::string longest = "";
+                        for (int i = 0; i < (int)AnimalVar::animal_var_max; i++)
+                        {
+                            if (longest.length() < ANIMAL_VAR_NAMES[i].length())
+                            {
+                                longest = ANIMAL_VAR_NAMES[i];
+                            }
+                        }
+
+                        //Set width of combo box to longest animal var length
+                        ImGuiStyle& style = ImGui::GetStyle();
+                        float w = ImGui::CalcTextSize(longest.c_str()).x + style.FramePadding.x * 2.0f;
+                        float spacing = style.ItemInnerSpacing.x;
+                        const float combo_width = w;
+                        ImGui::SetNextItemWidth(combo_width);
+
+                        //Create combo box
+                        if (ImGui::BeginCombo("", input.VarName.c_str()))
+                        {
+                            for (int n = 0; n < IM_ARRAYSIZE(ANIMAL_VAR_NAMES); n++)
+                            {
+                                bool is_selected = !strcmp(input.VarName.c_str(), ANIMAL_VAR_NAMES[n].c_str());
+                                if (ImGui::Selectable(ANIMAL_VAR_NAMES[n].c_str(), is_selected))
+                                    input.VarName = ANIMAL_VAR_NAMES[n];
+                                if (is_selected)
+                                    ImGui::SetItemDefaultFocus();
+                            }
+
+                            ImGui::EndCombo();
+                        }
+                    }
+                    else //Other pin
+                    {
+                        DrawPinIcon(input, IsPinLinked(input.ID), (int)(alpha * 255));
+                    }
+
+                    if (input.Type == PinType::String && !IsPinLinked(input.ID)) //String pin
+                    {
+                        static char buffer[128] = "Edit Me\nMultiline!";
+                        static bool wasActive = false;
+
+                        ImGui::PushItemWidth(100.0f);
+                        ImGui::InputText("##edit", buffer, 127);
+                        ImGui::PopItemWidth();
+                        if (ImGui::IsItemActive() && !wasActive)
+                        {
+                            ed::EnableShortcuts(false);
+                            wasActive = true;
+                        }
+                        else if (!ImGui::IsItemActive() && wasActive)
+                        {
+                            ed::EnableShortcuts(true);
+                            wasActive = false;
+                        }
+                        ImGui::Spring(0);
+                    }
+                    //////////////////////////////////////////////////////
                     ImGui::Spring(0);
                     if (!input.Name.empty())
                     {
@@ -1742,8 +1821,6 @@ struct Example :
                 node = SpawnBlend3Node();
             if (ImGui::MenuItem("Evaluate Clip Ctrl Node"))
                 node = SpawnClipCtrlNode();
-            if (ImGui::MenuItem("Animal Variable"))
-                node = SpawnAnimalVarNode();
             if (ImGui::MenuItem("Input Action"))
                 node = SpawnInputActionNode();
             if (ImGui::MenuItem("Output Action"))
