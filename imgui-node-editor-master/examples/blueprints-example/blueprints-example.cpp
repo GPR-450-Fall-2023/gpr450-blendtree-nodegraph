@@ -337,7 +337,7 @@ struct Example :
         m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Hierarchy Pose Group", PinType::Object);*/
         m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Clip Ctrl", PinType::Dropdown);
         m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Hierarchy Pose Group", PinType::Dropdown);
-        m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output", PinType::Flow);
+        m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output Pose", PinType::Flow);
 
         BuildNode(&m_Nodes.back());
 
@@ -613,7 +613,7 @@ struct Example :
         ed::SetCurrentEditor(m_Editor);
 
         Node* node;
-        node = SpawnInputActionNode();      ed::SetNodePosition(node->ID, ImVec2(-252, 220));
+        /*node = SpawnInputActionNode();      ed::SetNodePosition(node->ID, ImVec2(-252, 220));
         node = SpawnBranchNode();           ed::SetNodePosition(node->ID, ImVec2(-300, 351));
         node = SpawnDoNNode();              ed::SetNodePosition(node->ID, ImVec2(-238, 504));
         node = SpawnOutputActionNode();     ed::SetNodePosition(node->ID, ImVec2(71, 80));
@@ -641,7 +641,7 @@ struct Example :
         m_Links.push_back(Link(GetNextLinkId(), m_Nodes[5].Outputs[0].ID, m_Nodes[6].Inputs[0].ID));
         m_Links.push_back(Link(GetNextLinkId(), m_Nodes[5].Outputs[0].ID, m_Nodes[7].Inputs[0].ID));
 
-        m_Links.push_back(Link(GetNextLinkId(), m_Nodes[14].Outputs[0].ID, m_Nodes[15].Inputs[0].ID));
+        m_Links.push_back(Link(GetNextLinkId(), m_Nodes[14].Outputs[0].ID, m_Nodes[15].Inputs[0].ID));*/
 
         m_HeaderBackground = LoadTexture("data/BlueprintBackground.png");
         m_SaveIcon = LoadTexture("data/ic_save_white_24dp.png");
@@ -1088,9 +1088,11 @@ struct Example :
                     builder.Input(input.ID);
                     ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
-                    /////////////////////// Dropdown Menus //////////////////////////////////
+                    /////////////////////// Dropdown Menus and other custom changes //////////////////////////////////
                     //Dillon Drummond
-                    if (input.Type == PinType::Dropdown) //Dropdown pin
+
+                    //Dropdown pin, don't draw icon
+                    if (input.Type == PinType::Dropdown) 
                     {
                         // Find the longest animal var name
                         std::string longest = "";
@@ -1128,8 +1130,9 @@ struct Example :
                     {
                         DrawPinIcon(input, IsPinLinked(input.ID), (int)(alpha * 255));
                     }
-
-                    if (input.Type == PinType::String && !IsPinLinked(input.ID)) //String pin
+                    
+                    //String pin, add textbox after icon
+                    if (input.Type == PinType::String && !IsPinLinked(input.ID)) 
                     {
                         //Adapted from output pin in the section below
                         bool wasActive = false;
