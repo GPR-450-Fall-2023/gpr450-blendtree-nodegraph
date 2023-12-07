@@ -329,6 +329,8 @@ struct Example :
 
     /////////////// Custom Nodes /////////////////
 
+    
+
     Node* SpawnClipCtrlNode()
     {
         m_Nodes.emplace_back(GetNextId(), "Evaluate Clip Controller");
@@ -348,14 +350,72 @@ struct Example :
     {
         m_Nodes.emplace_back(GetNextId(), "Blend 3");
         m_Nodes.back().Inputs.emplace_back(GetNextId(), "ID", PinType::String);
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Magnitude", PinType::Dropdown);
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Threshold 1", PinType::Dropdown);
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Threshold 2", PinType::Dropdown);
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Threshold 3", PinType::Dropdown);
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input 1", PinType::Flow);
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input 2", PinType::Flow);
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input 3", PinType::Flow);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Blend Param", PinType::Dropdown);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Threshold A", PinType::Dropdown);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Threshold B", PinType::Dropdown);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Threshold C", PinType::Dropdown);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input A", PinType::Flow);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input B", PinType::Flow);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input C", PinType::Flow);
         m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output Pose", PinType::Flow);
+
+        BuildNode(&m_Nodes.back());
+
+        return &m_Nodes.back();
+    }
+
+    Node* SpawnLerpNode()
+    {
+        m_Nodes.emplace_back(GetNextId(), "Lerp");
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "ID", PinType::String);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Magnitude", PinType::Dropdown);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input A", PinType::Flow);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input B", PinType::Flow);
+        m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output Pose", PinType::Flow);
+
+        BuildNode(&m_Nodes.back());
+
+        return &m_Nodes.back();
+    }
+
+    Node* SpawnHandleJumpNode()
+    {
+        m_Nodes.emplace_back(GetNextId(), "Handle Jump");
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "ID", PinType::String);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Duration", PinType::Dropdown);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Height", PinType::Dropdown);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Fade In Time", PinType::Dropdown);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Fade Out Time", PinType::Dropdown);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Time Since Jump", PinType::Dropdown);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Lerp Param", PinType::Dropdown);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Is Jumping", PinType::Dropdown);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Control Node", PinType::Dropdown);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input 1", PinType::Flow);
+        m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output Pose", PinType::Flow);
+
+        BuildNode(&m_Nodes.back());
+
+        return &m_Nodes.back();
+    }
+
+    Node* SpawnBranchNode()
+    {
+        m_Nodes.emplace_back(GetNextId(), "Branch");
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "ID", PinType::String);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Condition", PinType::Dropdown);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "True", PinType::Flow);
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "False", PinType::Flow);
+        m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output Pose", PinType::Flow);
+
+        BuildNode(&m_Nodes.back());
+
+        return &m_Nodes.back();
+    }
+
+    Node* SpawnRootNode()
+    {
+        m_Nodes.emplace_back(GetNextId(), "Root");
+        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Root Pose", PinType::Flow);
 
         BuildNode(&m_Nodes.back());
 
@@ -376,7 +436,7 @@ struct Example :
         return &m_Nodes.back();
     }
 
-    Node* SpawnBranchNode()
+    /*Node* SpawnBranchNode()
     {
         m_Nodes.emplace_back(GetNextId(), "Branch");
         m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
@@ -387,7 +447,7 @@ struct Example :
         BuildNode(&m_Nodes.back());
 
         return &m_Nodes.back();
-    }
+    }*/
 
     Node* SpawnDoNNode()
     {
@@ -427,11 +487,11 @@ struct Example :
         return &m_Nodes.back();
     }
 
-    Node* SpawnMessageNode()
+    Node* SpawnStringNode()
     {
         m_Nodes.emplace_back(GetNextId(), "", ImColor(128, 195, 248));
         m_Nodes.back().Type = NodeType::Simple;
-        m_Nodes.back().Outputs.emplace_back(GetNextId(), "Message", PinType::String);
+        m_Nodes.back().Outputs.emplace_back(GetNextId(), "String", PinType::String);
 
         BuildNode(&m_Nodes.back());
 
@@ -961,7 +1021,62 @@ struct Example :
             ed::ClearSelection();
         ImGui::EndHorizontal();
         ImGui::Indent();
-        for (int i = 0; i < nodeCount; ++i) ImGui::Text("Node (%p)", selectedNodes[i].AsPointer());
+        for (int i = 0; i < nodeCount; ++i)
+        {
+            //ImGui::Text("Node (%p)", selectedNodes[i].AsPointer());
+
+            ///////////////// Dropdown Menu Implementation ////////////////////
+            //Dillon Drummond
+            Node* node = FindNode(selectedNodes[i]);
+
+            ImGui::Text("Node Name: %s - %s", node->Name.c_str(), node->Inputs[0].data.c_str());
+
+            for (int pinIndex = 0; pinIndex < node->Inputs.size(); pinIndex++)
+            {
+                Pin* currentPin = &node->Inputs[pinIndex];
+                //Dropdown pin, don't draw icon
+                if (currentPin->Type == PinType::Dropdown)
+                {
+                    // Find the longest animal var name
+                    std::string longest = "";
+                    for (int i = 0; i < (int)AnimalVar::animal_var_max; i++)
+                    {
+                        if (longest.length() < ANIMAL_VAR_NAMES[i].length())
+                        {
+                            longest = ANIMAL_VAR_NAMES[i];
+                        }
+                    }
+
+                    //Set width of combo box to longest animal var length
+                    ImGuiStyle& style = ImGui::GetStyle();
+                    float w = ImGui::CalcTextSize(longest.c_str()).x + style.FramePadding.x * 2.0f;
+                    float spacing = style.ItemInnerSpacing.x;
+                    const float combo_width = w;
+                    ImGui::SetNextItemWidth(combo_width);
+
+                    //Unique ID using pointer address, node name, and pin name
+                    std::string name = currentPin->Name + " (" + node->Name + ", " + std::to_string((int)&(node->ID)) + ")";
+
+                    //Create combo box
+                    if (ImGui::BeginCombo(name.c_str(), currentPin->data.c_str()))
+                    {
+                        for (int i = 0; i < IM_ARRAYSIZE(ANIMAL_VAR_NAMES); i++)
+                        {
+                            bool is_selected = !strcmp(currentPin->data.c_str(), ANIMAL_VAR_NAMES[i].c_str());
+                            if (ImGui::Selectable(ANIMAL_VAR_NAMES[i].c_str(), is_selected))
+                                currentPin->data = ANIMAL_VAR_NAMES[i];
+                            if (is_selected)
+                                ImGui::SetItemDefaultFocus();
+                        }
+
+                        ImGui::EndCombo();
+                    }
+                }
+            }
+
+            ImGui::Spacing();
+        }
+
         for (int i = 0; i < linkCount; ++i) ImGui::Text("Link (%p)", selectedLinks[i].AsPointer());
         ImGui::Unindent();
 
@@ -1094,37 +1209,41 @@ struct Example :
                     //Dropdown pin, don't draw icon
                     if (input.Type == PinType::Dropdown) 
                     {
-                        // Find the longest animal var name
-                        std::string longest = "";
-                        for (int i = 0; i < (int)AnimalVar::animal_var_max; i++)
-                        {
-                            if (longest.length() < ANIMAL_VAR_NAMES[i].length())
-                            {
-                                longest = ANIMAL_VAR_NAMES[i];
-                            }
-                        }
+                        //Draw dropdown menu on node, not working
+                        // 
+                        //std::string name = node.Name + " (" + input.Name + ", " + std::to_string((int)&(node.ID)) + ")";
 
-                        //Set width of combo box to longest animal var length
-                        ImGuiStyle& style = ImGui::GetStyle();
-                        float w = ImGui::CalcTextSize(longest.c_str()).x + style.FramePadding.x * 2.0f;
-                        float spacing = style.ItemInnerSpacing.x;
-                        const float combo_width = w;
-                        ImGui::SetNextItemWidth(combo_width);
+                        //// Find the longest animal var name
+                        //std::string longest = "";
+                        //for (int i = 0; i < (int)AnimalVar::animal_var_max; i++)
+                        //{
+                        //    if (longest.length() < ANIMAL_VAR_NAMES[i].length())
+                        //    {
+                        //        longest = ANIMAL_VAR_NAMES[i];
+                        //    }
+                        //}
 
-                        //Create combo box
-                        if (ImGui::BeginCombo("", input.data.c_str()))
-                        {
-                            for (int n = 0; n < IM_ARRAYSIZE(ANIMAL_VAR_NAMES); n++)
-                            {
-                                bool is_selected = !strcmp(input.data.c_str(), ANIMAL_VAR_NAMES[n].c_str());
-                                if (ImGui::Selectable(ANIMAL_VAR_NAMES[n].c_str(), is_selected))
-                                    input.data = ANIMAL_VAR_NAMES[n];
-                                if (is_selected)
-                                    ImGui::SetItemDefaultFocus();
-                            }
+                        ////Set width of combo box to longest animal var length
+                        //ImGuiStyle& style = ImGui::GetStyle();
+                        //float w = ImGui::CalcTextSize(longest.c_str()).x + style.FramePadding.x * 2.0f;
+                        //float spacing = style.ItemInnerSpacing.x;
+                        //const float combo_width = w;
+                        //ImGui::SetNextItemWidth(combo_width);
 
-                            ImGui::EndCombo();
-                        }
+                        ////Create combo box
+                        //if (ImGui::BeginCombo(name.c_str(), input.data.c_str()))
+                        //{
+                        //    for (int i = 0; i < IM_ARRAYSIZE(ANIMAL_VAR_NAMES); i++)
+                        //    {
+                        //        bool is_selected = !strcmp(input.data.c_str(), ANIMAL_VAR_NAMES[i].c_str());
+                        //        if (ImGui::Selectable(ANIMAL_VAR_NAMES[i].c_str(), is_selected))
+                        //            input.data = ANIMAL_VAR_NAMES[i];
+                        //        if (is_selected)
+                        //            ImGui::SetItemDefaultFocus();
+                        //    }
+
+                        //    ImGui::EndCombo();
+                        //}
                     }
                     else //Other pin
                     {
@@ -1159,7 +1278,22 @@ struct Example :
                     ImGui::Spring(0);
                     if (!input.Name.empty())
                     {
-                        ImGui::TextUnformatted(input.Name.c_str());
+                        
+
+                        /////
+                        // Dillon Drummond
+                        //Display animal var name next to dropdown pin name
+                        if (input.Type == PinType::Dropdown)
+                        {
+                            std::string text = input.Name + ": " + input.data;
+                            ImGui::TextUnformatted(text.c_str());
+                        }
+                        else
+                        {
+                            ImGui::TextUnformatted(input.Name.c_str());
+                        }
+                        /////
+
                         ImGui::Spring(0);
                     }
                     if (input.Type == PinType::Bool)
@@ -1823,11 +1957,22 @@ struct Example :
             //drawList->AddCircleFilled(ImGui::GetMousePosOnOpeningCurrentPopup(), 10.0f, 0xFFFF00FF);
 
             Node* node = nullptr;
-            if (ImGui::MenuItem("Blend 3 Node"))
-                node = SpawnBlend3Node();
+            if (ImGui::MenuItem("Root Node"))
+                node = SpawnRootNode();
             if (ImGui::MenuItem("Evaluate Clip Ctrl Node"))
                 node = SpawnClipCtrlNode();
-            if (ImGui::MenuItem("Input Action"))
+            if (ImGui::MenuItem("Blend 3 Node"))
+                node = SpawnBlend3Node();
+            if (ImGui::MenuItem("Lerp Node"))
+                node = SpawnLerpNode();
+            if (ImGui::MenuItem("Handle Jump Node"))
+                node = SpawnHandleJumpNode();
+            if (ImGui::MenuItem("Branch Node"))
+                node = SpawnBranchNode();
+            if (ImGui::MenuItem("Root Node"))
+                node = SpawnRootNode();
+            ImGui::Separator();
+            /*if (ImGui::MenuItem("Input Action"))
                 node = SpawnInputActionNode();
             if (ImGui::MenuItem("Output Action"))
                 node = SpawnOutputActionNode();
@@ -1855,14 +2000,14 @@ struct Example :
                 node = SpawnTreeTaskNode();
             if (ImGui::MenuItem("Random Wait"))
                 node = SpawnTreeTask2Node();
-            ImGui::Separator();
-            if (ImGui::MenuItem("Message"))
-                node = SpawnMessageNode();
-            ImGui::Separator();
+            ImGui::Separator();*/
+            if (ImGui::MenuItem("String"))
+                node = SpawnStringNode();
+            /*ImGui::Separator();
             if (ImGui::MenuItem("Transform"))
                 node = SpawnHoudiniTransformNode();
             if (ImGui::MenuItem("Group"))
-                node = SpawnHoudiniGroupNode();
+                node = SpawnHoudiniGroupNode();*/
 
             if (node)
             {
