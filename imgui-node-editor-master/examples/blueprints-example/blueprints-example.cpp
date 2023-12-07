@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <utility>
 
+#include "json/json.h"
 #include "json/value.h"
 #include "json/writer.h"
 #include <fstream>
@@ -749,7 +750,11 @@ struct Example :
 
         cout<<people["profession"]; //NULL! There is no element with key "profession". Hence a new empty element will be created.
         */
-
+        
+        // using a placeholder for testing - needs to be swapped out by user's selected file
+      //  std::ifstream people_file("./examples/blueprints-example/blendtree.json", std::ifstream::binary);
+      //  Json::Value people;
+       // people_file >> people;
 
 
         // display depending on node type
@@ -761,6 +766,7 @@ struct Example :
         // Node* node;
         // node = SpawnDoNNode();              
         // ed::SetNodePosition(node->ID, ImVec2(-238, 504));
+        Node* node;
     }
 
     //////////////////////////////////////////////

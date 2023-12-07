@@ -69,7 +69,8 @@ macro(add_example_executable name)
 
     find_package(imgui REQUIRED)
     find_package(imgui_node_editor REQUIRED)
-    target_link_libraries(${name} PRIVATE imgui imgui_node_editor application)
+    find_package(jsoncpp REQUIRED)
+    target_link_libraries(${name} PRIVATE imgui imgui_node_editor application jsoncpp_lib)
 
     set(_ExampleBinDir ${CMAKE_BINARY_DIR}/bin)
 
