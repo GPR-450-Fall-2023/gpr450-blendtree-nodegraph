@@ -811,6 +811,73 @@ struct Example :
         ed::SetCurrentEditor(m_Editor);
 
         Node* node;
+        node = SpawnRootNode();         ed::SetNodePosition(node->ID, ImVec2(0, 500));          //0
+
+        node = SpawnBranchNode();       ed::SetNodePosition(node->ID, ImVec2(-500, 500));       //1
+        node->Inputs[0].data = "jumpBranchNode";
+        node->Inputs[1].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_isJumping];
+
+        node = SpawnHandleJumpNode();   ed::SetNodePosition(node->ID, ImVec2(-1000, 250));      //2
+        node->Inputs[0].data = "handleJumpNode";
+        node->Inputs[1].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_jumpDuration];
+        node->Inputs[2].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_jumpHeight];
+        node->Inputs[3].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_jumpFadeInTime];
+        node->Inputs[4].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_jumpFadeOutTime];
+        node->Inputs[5].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_timeSinceJump];
+        node->Inputs[6].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_jumpLerpParam];
+        node->Inputs[7].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_isJumping];
+        node->Inputs[8].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_ctrlNode];
+
+        node = SpawnLerpNode();         ed::SetNodePosition(node->ID, ImVec2(-1500, 500));      //3
+        node->Inputs[0].data = "jumpGroundLerpNode";
+        node->Inputs[1].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_jumpLerpParam];
+
+        node = SpawnBlend3Node();       ed::SetNodePosition(node->ID, ImVec2(-2000, 750));      //4
+        node->Inputs[0].data = "blendGroundPoseNode";
+        node->Inputs[1].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_ctrlVelocityMagnitude];
+        node->Inputs[2].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_idleBlendThreshold];
+        node->Inputs[3].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_walkBlendThreshold];
+        node->Inputs[4].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_runBlendThreshold];
+
+        node = SpawnClipCtrlNode();     ed::SetNodePosition(node->ID, ImVec2(-2200, 500));      //5
+        node->Inputs[0].data = "jumpCCNode";
+        node->Inputs[1].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_jumpClipCtrl];
+        node->Inputs[2].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_hierarchyPoseGroup_skel];
+
+        node = SpawnClipCtrlNode();     ed::SetNodePosition(node->ID, ImVec2(-2700, 700));      //6
+        node->Inputs[0].data = "idleCCNode";
+        node->Inputs[1].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_idleClipCtrl];
+        node->Inputs[2].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_hierarchyPoseGroup_skel];
+
+        node = SpawnClipCtrlNode();     ed::SetNodePosition(node->ID, ImVec2(-2700, 850));      //7
+        node->Inputs[0].data = "walkCCNode";
+        node->Inputs[1].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_walkClipCtrl];
+        node->Inputs[2].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_hierarchyPoseGroup_skel];
+
+        node = SpawnClipCtrlNode();     ed::SetNodePosition(node->ID, ImVec2(-2700, 1000));     //8
+        node->Inputs[0].data = "runCCNode";
+        node->Inputs[1].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_runClipCtrl];
+        node->Inputs[2].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_hierarchyPoseGroup_skel];
+
+
+        ed::NavigateToContent();
+
+        BuildNodes();
+
+        m_Links.push_back(Link(GetNextLinkId(), m_Nodes[1].Outputs[0].ID, m_Nodes[0].Inputs[0].ID));
+
+        m_Links.push_back(Link(GetNextLinkId(), m_Nodes[2].Outputs[0].ID, m_Nodes[1].Inputs[2].ID));
+
+        m_Links.push_back(Link(GetNextLinkId(), m_Nodes[3].Outputs[0].ID, m_Nodes[2].Inputs[9].ID));
+
+        m_Links.push_back(Link(GetNextLinkId(), m_Nodes[4].Outputs[0].ID, m_Nodes[3].Inputs[3].ID));
+        m_Links.push_back(Link(GetNextLinkId(), m_Nodes[4].Outputs[0].ID, m_Nodes[1].Inputs[3].ID));
+
+        m_Links.push_back(Link(GetNextLinkId(), m_Nodes[5].Outputs[0].ID, m_Nodes[3].Inputs[2].ID));
+
+        m_Links.push_back(Link(GetNextLinkId(), m_Nodes[6].Outputs[0].ID, m_Nodes[4].Inputs[5].ID));
+        m_Links.push_back(Link(GetNextLinkId(), m_Nodes[7].Outputs[0].ID, m_Nodes[4].Inputs[6].ID));
+        m_Links.push_back(Link(GetNextLinkId(), m_Nodes[8].Outputs[0].ID, m_Nodes[4].Inputs[7].ID));
         /*node = SpawnInputActionNode();      ed::SetNodePosition(node->ID, ImVec2(-252, 220));
         node = SpawnBranchNode();           ed::SetNodePosition(node->ID, ImVec2(-300, 351));
         node = SpawnDoNNode();              ed::SetNodePosition(node->ID, ImVec2(-238, 504));
