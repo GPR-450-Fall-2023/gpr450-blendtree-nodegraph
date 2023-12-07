@@ -13,6 +13,7 @@
 #include <utility>
 
 #include <json/value.h>
+#include <json/writer.h>
 #include <fstream>
 
 
@@ -585,6 +586,7 @@ struct Example :
         // 1. file save location
         // 2. file name
         // 3. save button (bind to SaveBlendTreeToJSON())
+        // 4. show user feedback of fail/success
         SaveBlendTreeToJSON();
     }
 
@@ -592,7 +594,8 @@ struct Example :
     {
         // toggles a window that displays the following:
         // 1. file select
-        // 3. load button (bind to LoadBlendTreeFromJSON())
+        // 2. load button (bind to LoadBlendTreeFromJSON())
+        // 3. show user feedback of fail/success
         LoadBlendTreeFromJSON();
     }
 
@@ -627,6 +630,45 @@ struct Example :
         // get nodes from m_Nodes
         // 
 
+
+        // write to json
+        // example from https://stackoverflow.com/questions/4289986/jsoncpp-writing-to-files
+        /*
+        //code:
+        Json::Value event;
+        Json::Value vec(Json::arrayValue);
+        vec.append(Json::Value(1));
+        vec.append(Json::Value(2));
+        vec.append(Json::Value(3));
+
+        event["competitors"]["home"]["name"] = "Liverpool";
+        event["competitors"]["away"]["code"] = 89223;
+        event["competitors"]["away"]["name"] = "Aston Villa";
+        event["competitors"]["away"]["code"]=vec;
+
+        //std::cout << event << std::endl;
+
+        ofstream myfile;
+        myfile.open ("example.txt");
+        myfile << event;
+        myfile.close();
+
+        // output:
+        {
+                "competitors" :
+                {
+                        "away" :
+                        {
+                                "code" : [ 1, 2, 3 ],
+                                "name" : "Aston Villa"
+                        },
+                        "home" :
+                        {
+                                "name" : "Liverpool"
+                        }
+                }
+        }
+        */
     }
 
     void LoadBlendTreeFromJSON()
