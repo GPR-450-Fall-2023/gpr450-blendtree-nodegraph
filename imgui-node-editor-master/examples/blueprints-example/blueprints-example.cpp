@@ -573,6 +573,76 @@ struct Example :
             BuildNode(&node);
     }
 
+    //////////// Blend Tree JSON I/O //////////////
+    // aster
+
+    void ShowSaveWindow()
+    {
+        // toggles a window that displays the following:
+        // 1. file save location
+        // 2. file name
+        // 3. save button (bind to SaveBlendTreeToJSON())
+        SaveBlendTreeToJSON();
+    }
+
+    void ShowLoadWindow()
+    {
+        // toggles a window that displays the following:
+        // 1. file select
+        // 3. load button (bind to LoadBlendTreeFromJSON())
+        LoadBlendTreeFromJSON();
+    }
+
+    void SaveBlendTreeToJSON()
+    {
+        // example node data: (excerpt from blendtree.json)
+        /*
+        {
+            "node_num": 8,
+
+            "runCCNode": {
+                "blendOp": "blendop_evaluate_clip_controller",
+                "miscData0": "animal_var_runClipCtrl",
+                "miscData1": "animal_var_hierarchyPoseGroup_skel"
+            },
+
+            "handleJumpNode": {
+                "blendOp": "blendop_handle_jump",
+                "paramData0": "animal_var_jumpDuration",
+                "paramData1":  "animal_var_jumpHeight",
+                "paramData2":  "animal_var_jumpFadeInTime",
+                "paramData3":  "animal_var_jumpFadeOutTime",
+                "miscData0": "animal_var_timeSinceJump",
+                "miscData1":  "animal_var_jumpLerpParam",
+                "miscData2":  "animal_var_isJumping",
+                "miscData3":  "animal_var_ctrlNode",
+                "spatialDataNodes0": "jumpGroundLerpNode"
+            }
+        }
+        */
+
+        // get nodes from m_Nodes
+        // 
+
+    }
+
+    void LoadBlendTreeFromJSON()
+    {
+        // load json file
+
+        // display depending on node type
+
+        // spawn nodes
+
+        // example:
+        // 
+        // Node* node;
+        // node = SpawnDoNNode();              
+        // ed::SetNodePosition(node->ID, ImVec2(-238, 504));
+    }
+
+    //////////////////////////////////////////////
+
     void OnStart() override
     {
         ed::Config config;
@@ -807,6 +877,12 @@ struct Example :
             for (auto& link : m_Links)
                 ed::Flow(link.ID);
         }
+        /////////// FOR JSON I/O /////////////
+        if (ImGui::Button("Save Blend File"))
+            ShowSaveWindow();
+        if (ImGui::Button("Load Blend File"))
+            ShowLoadWindow();
+        //////////////////////////////////////
         ImGui::Spring();
         if (ImGui::Button("Edit Style"))
             showStyleEditor = true;
