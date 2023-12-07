@@ -12,6 +12,10 @@
 #include <algorithm>
 #include <utility>
 
+#include "json/value.h"
+#include "json/writer.h"
+#include <fstream>
+
 
 static inline ImRect ImGui_GetItemRect()
 {
@@ -633,6 +637,134 @@ struct Example :
             BuildNode(&node);
     }
 
+    //////////// Blend Tree JSON I/O //////////////
+    // aster
+
+    void ShowSaveWindow()
+    {
+        // toggles a window that displays the following:
+        // 1. file save location
+        // 2. file name
+        // 3. save button (bind to SaveBlendTreeToJSON())
+        // 4. show user feedback of fail/success
+        SaveBlendTreeToJSON();
+    }
+
+    void ShowLoadWindow()
+    {
+        // toggles a window that displays the following:
+        // 1. file select
+        // 2. load button (bind to LoadBlendTreeFromJSON())
+        // 3. show user feedback of fail/success
+        LoadBlendTreeFromJSON();
+    }
+
+    void SaveBlendTreeToJSON()
+    {
+        // example node data: (excerpt from blendtree.json)
+        /*
+        {
+            "node_num": 8,
+
+            "runCCNode": {
+                "blendOp": "blendop_evaluate_clip_controller",
+                "miscData0": "animal_var_runClipCtrl",
+                "miscData1": "animal_var_hierarchyPoseGroup_skel"
+            },
+
+            "handleJumpNode": {
+                "blendOp": "blendop_handle_jump",
+                "paramData0": "animal_var_jumpDuration",
+                "paramData1":  "animal_var_jumpHeight",
+                "paramData2":  "animal_var_jumpFadeInTime",
+                "paramData3":  "animal_var_jumpFadeOutTime",
+                "miscData0": "animal_var_timeSinceJump",
+                "miscData1":  "animal_var_jumpLerpParam",
+                "miscData2":  "animal_var_isJumping",
+                "miscData3":  "animal_var_ctrlNode",
+                "spatialDataNodes0": "jumpGroundLerpNode"
+            }
+        }
+        */
+
+        // get nodes from m_Nodes
+        // 
+
+
+        // write to json
+        // example from https://stackoverflow.com/questions/4289986/jsoncpp-writing-to-files
+        /*
+        //code:
+        Json::Value event;
+        Json::Value vec(Json::arrayValue);
+        vec.append(Json::Value(1));
+        vec.append(Json::Value(2));
+        vec.append(Json::Value(3));
+
+        event["competitors"]["home"]["name"] = "Liverpool";
+        event["competitors"]["away"]["code"] = 89223;
+        event["competitors"]["away"]["name"] = "Aston Villa";
+        event["competitors"]["away"]["code"]=vec;
+
+        //std::cout << event << std::endl;
+
+        ofstream myfile;
+        myfile.open ("example.txt");
+        myfile << event;
+        myfile.close();
+
+        // output:
+        {
+                "competitors" :
+                {
+                        "away" :
+                        {
+                                "code" : [ 1, 2, 3 ],
+                                "name" : "Aston Villa"
+                        },
+                        "home" :
+                        {
+                                "name" : "Liverpool"
+                        }
+                }
+        }
+        */
+    }
+
+    void LoadBlendTreeFromJSON()
+    {
+        // load json file
+        // example from https://stackoverflow.com/questions/32205981/reading-json-files-in-c
+        /*
+        std::ifstream people_file("people.json", std::ifstream::binary);
+        Json::Value people;
+        people_file >> people;
+
+        cout<<people; //This will print the entire json object.
+
+        //The following lines will let you access the indexed objects.
+        cout<<people["Anna"]; //Prints the value for "Anna"
+        cout<<people["ben"]; //Prints the value for "Ben"
+        cout<<people["Anna"]["profession"]; //Prints the value corresponding to "profession" in the json for "Anna"
+
+        cout<<people["profession"]; //NULL! There is no element with key "profession". Hence a new empty element will be created.
+        */
+
+
+
+        // display depending on node type
+
+        // spawn nodes
+
+        // example:
+        // 
+        // Node* node;
+        // node = SpawnDoNNode();              
+        // ed::SetNodePosition(node->ID, ImVec2(-238, 504));
+    }
+
+    //////////////////////////////////////////////
+
     void OnStart() override
     {
         ed::Config config;
@@ -867,6 +999,12 @@ struct Example :
             for (auto& link : m_Links)
                 ed::Flow(link.ID);
         }
+        /////////// FOR JSON I/O /////////////
+        if (ImGui::Button("Save Blend File"))
+            ShowSaveWindow();
+        if (ImGui::Button("Load Blend File"))
+            ShowLoadWindow();
+        //////////////////////////////////////
         ImGui::Spring();
         if (ImGui::Button("Edit Style"))
             showStyleEditor = true;
