@@ -12,9 +12,9 @@
 #include <algorithm>
 #include <utility>
 
-#include "json/json.h"
-#include "json/value.h"
-#include "json/writer.h"
+#include <json/json.h>
+#include <json/value.h>
+#include <json/writer.h>
 #include <fstream>
 #include <iostream> // remove later - just for debug purposes
 #include <windows.h> // remove later - just for debug purposes
@@ -1829,7 +1829,7 @@ struct Example :
             PrintJSONValue(itr.key());
             printf("\n");
 
-            printf(itr.key()["blendOp"].asString().c_str());
+       //     printf(itr.key()["blendOp"].asString().c_str());
             /*for (Json::Value::const_iterator itrChild = header.begin(); itrChild != header.end(); itrChild++) {
                 PrintJSONValue(itrChild.key());
                 printf("\n");
