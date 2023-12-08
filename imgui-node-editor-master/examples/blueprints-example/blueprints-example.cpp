@@ -1706,7 +1706,7 @@ struct Example :
         ImGui::InputText("Save Path", cstr, 127);
         saveData.path = cstr;
 
-        if (ImGui::Button("Save"))
+        if (ImGui::Button("Save File"))
         {
             SaveBlendTreeToJSON();
         }
@@ -1724,7 +1724,7 @@ struct Example :
         ImGui::InputText("Load Path", cstr, 127);
         loadData.path = cstr;
 
-        if (ImGui::Button("Load"))
+        if (ImGui::Button("Load File"))
         {
             LoadBlendTreeFromJSON();
         }
