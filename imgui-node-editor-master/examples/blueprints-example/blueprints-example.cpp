@@ -1923,7 +1923,7 @@ struct Example :
     {
         std::ofstream fout;
 
-        fout.open("../../../../../../BlendGraphOutput/test.txt");
+        fout.open("../../../../../../BlendGraphOutput/blendtree.json");
 
         //Failed to save
         if (!fout || fout.fail())
@@ -1940,10 +1940,26 @@ struct Example :
 
             //Print target joint array
             fout << "\t\t\"target_joints\": [\n";
-            for (int jointIndex = 0; jointIndex < blendEditors[treeIndex].affectedBones.size(); jointIndex++)
+
+            for (std::unordered_map<std::string, bool>::iterator it = blendEditors[treeIndex].affectedBones.begin(); it != blendEditors[treeIndex].affectedBones.end(); it++)
             {
-                fout << "\t\t\t\"";// +std::to_string(blendEditors[treeIndex].affectedBones) + "\",\n";
+                if (it->second == true)
+                {
+                    fout << "\t\t\t\"" + it->first + "\"";
+
+                    if (std::next(it) != blendEditors[treeIndex].affectedBones.end())
+                    {
+                        fout << ",";
+                    }
+
+                    fout << std::endl;
+                }
             }
+
+            /*for (int jointIndex = 0; jointIndex < blendEditors[treeIndex].affectedBones.size(); jointIndex++)
+            {
+                fout << "\t\t\t\"" +std::to_string(blendEditors[treeIndex].affectedBones) + "\",\n";
+            }*/
             fout << "\t\t],\n";
 
             //Print number of nodes
