@@ -1918,6 +1918,33 @@ struct Example :
         }
     }
 
+    //std::string GetTreeString(Node* node, BlendEditor blendGraph, std::string existingTreeStr = "")
+    //{
+    //    if (node->Name == "Root")
+    //    {
+    //        /*if (node->Inputs[0].Node == nullptr)
+    //        {
+    //            return existingTreeStr;
+    //        }
+    //        else
+    //        {*/
+    //        int i = 0;
+    //        while (blendGraph.m_Links[i].EndPinID != node->Inputs[0].ID) {
+    //            i++;
+    //        }
+    //        int j = 0;
+    //        while (blendGraph.m_Nodes[j].Outputs[0].ID != blendGraph.m_Links[i].StartPinID) {
+    //            j++;
+    //        }
+    //        return GetTreeString(&(blendGraph.m_Nodes[j]), blendGraph, existingTreeStr);
+    //        //return GetTreeString(node->Inputs[0].Node, existingTreeStr);
+    //        //}
+    //    }
+    //    else
+    //    {
+    //        return "";
+    //    }
+    //}
 
     bool SaveBlendTreeToJSON()
     {
@@ -1939,7 +1966,7 @@ struct Example :
             fout << "\t\"blendTree" + std::to_string(treeIndex) + "\": {\n\n";
 
             //Print target joint array
-            fout << "\t\t\"target_joints\": [\n";
+            fout << "\t\t\"target_joints\": [" << std::endl;
 
             for (std::unordered_map<std::string, bool>::iterator it = blendEditors[treeIndex].affectedBones.begin(); it != blendEditors[treeIndex].affectedBones.end(); it++)
             {
@@ -1960,16 +1987,22 @@ struct Example :
             {
                 fout << "\t\t\t\"" +std::to_string(blendEditors[treeIndex].affectedBones) + "\",\n";
             }*/
-            fout << "\t\t],\n";
+            fout << "\t\t]," << std::endl;
 
             //Print number of nodes
-            fout << "\"node_num\": " + std::to_string(blendEditors[treeIndex].m_Nodes.size()) + ",\n";
+            fout << std::endl << "\t\t\"node_num\": " + std::to_string(blendEditors[treeIndex].m_Nodes.size()) + "," << std::endl << std::endl;
 
             //Print nodes
             for (int nodeIndex = 0; nodeIndex < blendEditors[treeIndex].m_Nodes.size(); nodeIndex++) {
                 fout << "\t\t\"";
                 // gotta figure out how to reference nodes in an order that doesnt reference nodes that dont exist yet
             }
+
+            /*std::string a = GetTreeString(&(blendEditors[treeIndex].m_Nodes[0]));
+
+            a = "23";*/
+
+            //add deepest node (root);
         }
 
         fout << "}\n";
