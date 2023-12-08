@@ -16,6 +16,9 @@
 #include "json/value.h"
 #include "json/writer.h"
 #include <fstream>
+#include <iostream> // remove later - just for debug purposes
+#include <windows.h> // remove later - just for debug purposes
+#include <consoleapi.h> // remove later - just for debug purposes
 
 
 static inline ImRect ImGui_GetItemRect()
@@ -1729,40 +1732,40 @@ struct Example :
 
     void SaveBlendTreeToJSON()
     {
-        // example node data: (excerpt from blendtree.json)
-        /*
-        {
-            "node_num": 8,
-
-            "runCCNode": {
-                "blendOp": "blendop_evaluate_clip_controller",
-                "miscData0": "animal_var_runClipCtrl",
-                "miscData1": "animal_var_hierarchyPoseGroup_skel"
-            },
-
-            "handleJumpNode": {
-                "blendOp": "blendop_handle_jump",
-                "paramData0": "animal_var_jumpDuration",
-                "paramData1":  "animal_var_jumpHeight",
-                "paramData2":  "animal_var_jumpFadeInTime",
-                "paramData3":  "animal_var_jumpFadeOutTime",
-                "miscData0": "animal_var_timeSinceJump",
-                "miscData1":  "animal_var_jumpLerpParam",
-                "miscData2":  "animal_var_isJumping",
-                "miscData3":  "animal_var_ctrlNode",
-                "spatialDataNodes0": "jumpGroundLerpNode"
-            }
-        }
-        */
 
         // get nodes from m_Nodes
+
+        // 1. find LAST node (root)
+        // 2. get input from root node
+        // 3. handle node based on its blendOp:
         // 
+        //      blendop_bool_branch
+        //          param, input1, input2
+        // 
+        //      blendop_handle_jump
+        //          duration, height, fadeintime, fadeouttime, timesincejump, lerp param, isjumping, ctrlnode, output pose
+        // 
+        //      blendop_lerp
+        //          input 1, output pose, param
+        // 
+        //      blendop_blend_3
+        //          Inputs: Magnitude, Threshold 1, Threshold 2, Threshold 3, Input 1, Input 2, Input 3
+        //          Outputs: Output Pose
+        // 
+        //      blendop_evaluate_clip_controller
+        //          Inputs: input clip ctrl, input hierarchy pose
+        //          Outputs: Output Pose
+
+        /*
+        m_Nodes.back().Inputs
+        m_Nodes.back().Outputs
+        */
+
 
 
         // write to json
         // example from https://stackoverflow.com/questions/4289986/jsoncpp-writing-to-files
-        /*
-        //code:
+        
         Json::Value event;
         Json::Value vec(Json::arrayValue);
         vec.append(Json::Value(1));
@@ -1776,12 +1779,13 @@ struct Example :
 
         //std::cout << event << std::endl;
 
-        ofstream myfile;
-        myfile.open ("example.txt");
+        std::ofstream myfile;
+        myfile.open ("../../../../blueprints-example/example.json");
         myfile << event;
         myfile.close();
 
         // output:
+        /*
         {
                 "competitors" :
                 {
@@ -1803,37 +1807,96 @@ struct Example :
     {
         // load json file
         // example from https://stackoverflow.com/questions/32205981/reading-json-files-in-c
-        /*
-        std::ifstream people_file("people.json", std::ifstream::binary);
-        Json::Value people;
-        people_file >> people;
 
-        cout<<people; //This will print the entire json object.
-
-        //The following lines will let you access the indexed objects.
-        cout<<people["Anna"]; //Prints the value for "Anna"
-        cout<<people["ben"]; //Prints the value for "Ben"
-        cout<<people["Anna"]["profession"]; //Prints the value corresponding to "profession" in the json for "Anna"
-
-        cout<<people["profession"]; //NULL! There is no element with key "profession". Hence a new empty element will be created.
-        */
+        // FOR DEBUG ONLY!!! REMOVE LATER!!!
+        // opens a console window and binds cout/cin to print to it (since cout is not supported by visual studio)
+        AllocConsole();
+        freopen("CONOUT$", "w", stdout);
+        freopen("CONOUT$", "w", stderr);
         
         // using a placeholder for testing - needs to be swapped out by user's selected file
-      //  std::ifstream people_file("./examples/blueprints-example/blendtree.json", std::ifstream::binary);
-      //  Json::Value people;
-       // people_file >> people;
+        std::ifstream blendtreeFile("../../../../blueprints-example/blendtree.json", std::ifstream::binary);
+        Json::Value blendtree;
+        blendtreeFile >> blendtree; // convert file into json "object"
 
+        std::cout << blendtree << std::endl; //This will print the entire json object.
 
-        // display depending on node type
+        // spawn nodes depending on blendOp
+        // modified from https://stackoverflow.com/questions/4800605/iterating-through-objects-in-jsoncpp
 
-        // spawn nodes
+        for (Json::Value::const_iterator itr = blendtree.begin(); itr != blendtree.end(); itr++) {
+
+            PrintJSONValue(itr.key());
+            printf("\n");
+
+            printf(itr.key()["blendOp"].asString().c_str());
+            /*for (Json::Value::const_iterator itrChild = header.begin(); itrChild != header.end(); itrChild++) {
+                PrintJSONValue(itrChild.key());
+                printf("\n");
+            }*/
+        }
+        
 
         // example:
         // 
         // Node* node;
         // node = SpawnDoNNode();              
         // ed::SetNodePosition(node->ID, ImVec2(-238, 504));
-        Node* node;
+       // Node* node;
+    }
+
+    //from https://stackoverflow.com/questions/4800605/iterating-through-objects-in-jsoncpp
+    // for testing only - remove later
+    void PrintJSONValue(const Json::Value& val)
+    {
+        if (val.isString()) {
+            printf("string(%s)", val.asString().c_str());
+        }
+        else if (val.isBool()) {
+            printf("bool(%d)", val.asBool());
+        }
+        else if (val.isInt()) {
+            printf("int(%d)", val.asInt());
+        }
+        else if (val.isUInt()) {
+            printf("uint(%u)", val.asUInt());
+        }
+        else if (val.isDouble()) {
+            printf("double(%f)", val.asDouble());
+        }
+        else
+        {
+            printf("unknown type=[%d]", val.type());
+        }
+    }
+
+    // from https://stackoverflow.com/questions/4800605/iterating-through-objects-in-jsoncpp
+    // for testing only - remove later
+    bool PrintJSONTree(const Json::Value& root, unsigned short depth /* = 0 */)
+    {
+        depth += 1;
+        printf(" {type=[%d], size=%d}", root.type(), root.size());
+
+        if (root.size() > 0) {
+            printf("\n");
+            for (Json::Value::const_iterator itr = root.begin(); itr != root.end(); itr++) {
+                // Print depth. 
+                for (int tab = 0; tab < depth; tab++) {
+                    printf("-");
+                }
+                printf(" subvalue(");
+                PrintJSONValue(itr.key());
+                printf(") -");
+                PrintJSONTree(*itr, depth);
+            }
+            return true;
+        }
+        else {
+            printf(" ");
+            PrintJSONValue(root);
+            printf("\n");
+        }
+        return true;
     }
 
     //////////////////////////////////////////////
@@ -2144,10 +2207,10 @@ struct Example :
         ImGui::EndHorizontal();
         ImGui::BeginHorizontal("Blend Files", ImVec2(paneWidth, 0));
         /////////// FOR JSON I/O /////////////
-        if (ImGui::Button("Save Blend File"))
+        /*if (ImGui::Button("Save Blend File"))
             ShowSaveWindow();
         if (ImGui::Button("Load Blend File"))
-            ShowLoadWindow();
+            ShowLoadWindow();*/
         //////////////////////////////////////
         ImGui::Spring();
         if (ImGui::Button("Edit Style"))
