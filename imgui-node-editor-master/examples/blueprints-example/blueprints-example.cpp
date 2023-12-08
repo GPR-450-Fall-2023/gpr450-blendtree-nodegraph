@@ -1918,8 +1918,38 @@ struct Example :
         }
     }
 
-    void SaveBlendTreeToJSON()
+    bool SaveBlendTreeToJSON()
     {
+        std::ofstream fout;
+
+        fout.open(saveData.path.c_str());
+
+        //Failed to save
+        if (!fout || fout.fail())
+        {
+            return false;
+        }
+
+        fout << "{\n";
+
+        for (int treeIndex = 0; treeIndex < blendEditors.size(); treeIndex++)
+        {
+            //Print blend tree name
+            fout << "\t\"blendTree" + std::to_string(treeIndex) + "\": {\n\n";
+
+            //Print target joint array
+            fout << "\t\t\"target_joints\": [\n";
+
+            for (int nodeIndex = 0; nodeIndex < blendEditors[treeIndex].m_Nodes.size(); nodeIndex++)
+            {
+                
+
+            }
+        }
+
+        fout << "}\n";
+
+        fout.close();
 
         // get nodes from m_Nodes
 
