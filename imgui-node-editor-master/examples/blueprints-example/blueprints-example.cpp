@@ -2173,6 +2173,7 @@ struct Example :
         int saveIconHeight = GetTextureWidth(m_SaveIcon);
         int restoreIconWidth = GetTextureWidth(m_RestoreIcon);
         int restoreIconHeight = GetTextureWidth(m_RestoreIcon);
+        
 
         ImGui::GetWindowDrawList()->AddRectFilled(
             ImGui::GetCursorScreenPos(),
@@ -2401,6 +2402,7 @@ struct Example :
 
             if (ImGui::Button(name.c_str()))
             {
+                ed::ClearSelection();
                 m_Current = BlendEditorWindow::editor;
                 currentEditorIndex = i;
             }
