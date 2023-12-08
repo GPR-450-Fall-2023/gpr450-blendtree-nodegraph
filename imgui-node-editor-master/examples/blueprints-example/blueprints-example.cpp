@@ -13,9 +13,9 @@
 #include <utility>
 #include <unordered_map>
 
-#include <json/json.h>
-#include <json/value.h>
-#include <json/writer.h>
+//#include <json/json.h>
+//#include <json/value.h>
+//#include <json/writer.h>
 #include <fstream>
 #include <iostream> // remove later - just for debug purposes
 #include <windows.h> // remove later - just for debug purposes
@@ -1917,23 +1917,23 @@ struct Example :
         // write to json
         // example from https://stackoverflow.com/questions/4289986/jsoncpp-writing-to-files
         
-        Json::Value event;
-        Json::Value vec(Json::arrayValue);
-        vec.append(Json::Value(1));
-        vec.append(Json::Value(2));
-        vec.append(Json::Value(3));
+        //Json::Value event;
+        //Json::Value vec(Json::arrayValue);
+        //vec.append(Json::Value(1));
+        //vec.append(Json::Value(2));
+        //vec.append(Json::Value(3));
 
-        event["competitors"]["home"]["name"] = "Liverpool";
-        event["competitors"]["away"]["code"] = 89223;
-        event["competitors"]["away"]["name"] = "Aston Villa";
-        event["competitors"]["away"]["code"]=vec;
+        //event["competitors"]["home"]["name"] = "Liverpool";
+        //event["competitors"]["away"]["code"] = 89223;
+        //event["competitors"]["away"]["name"] = "Aston Villa";
+        //event["competitors"]["away"]["code"]=vec;
 
-        //std::cout << event << std::endl;
+        ////std::cout << event << std::endl;
 
-        std::ofstream myfile;
-        myfile.open ("../../../../blueprints-example/example.json");
-        myfile << event;
-        myfile.close();
+        //std::ofstream myfile;
+        //myfile.open ("../../../../blueprints-example/example.json");
+        //myfile << event;
+        //myfile.close();
 
         // output:
         /*
@@ -1956,49 +1956,49 @@ struct Example :
 
     void LoadBlendTreeFromJSON()
     {
-        // load json file
-        // example from https://stackoverflow.com/questions/32205981/reading-json-files-in-c
+       // // load json file
+       // // example from https://stackoverflow.com/questions/32205981/reading-json-files-in-c
 
-        // FOR DEBUG ONLY!!! REMOVE LATER!!!
-        // opens a console window and binds cout/cin to print to it (since cout is not supported by visual studio)
-        AllocConsole();
-        freopen("CONOUT$", "w", stdout);
-        freopen("CONOUT$", "w", stderr);
-        
-        // using a placeholder for testing - needs to be swapped out by user's selected file
-        std::ifstream blendtreeFile("../../../../blueprints-example/blendtree.json", std::ifstream::binary);
-        Json::Value blendtree;
-        blendtreeFile >> blendtree; // convert file into json "object"
+       // // FOR DEBUG ONLY!!! REMOVE LATER!!!
+       // // opens a console window and binds cout/cin to print to it (since cout is not supported by visual studio)
+       // AllocConsole();
+       // freopen("CONOUT$", "w", stdout);
+       // freopen("CONOUT$", "w", stderr);
+       // 
+       // // using a placeholder for testing - needs to be swapped out by user's selected file
+       // std::ifstream blendtreeFile("../../../../blueprints-example/blendtree.json", std::ifstream::binary);
+       // Json::Value blendtree;
+       // blendtreeFile >> blendtree; // convert file into json "object"
 
-        std::cout << blendtree << std::endl; //This will print the entire json object.
+       // std::cout << blendtree << std::endl; //This will print the entire json object.
 
-        // spawn nodes depending on blendOp
-        // modified from https://stackoverflow.com/questions/4800605/iterating-through-objects-in-jsoncpp
+       // // spawn nodes depending on blendOp
+       // // modified from https://stackoverflow.com/questions/4800605/iterating-through-objects-in-jsoncpp
 
-        for (Json::Value::const_iterator itr = blendtree.begin(); itr != blendtree.end(); itr++) {
+       // for (Json::Value::const_iterator itr = blendtree.begin(); itr != blendtree.end(); itr++) {
 
-            PrintJSONValue(itr.key());
-            printf("\n");
+       //     PrintJSONValue(itr.key());
+       //     printf("\n");
 
-       //     printf(itr.key()["blendOp"].asString().c_str());
-            /*for (Json::Value::const_iterator itrChild = header.begin(); itrChild != header.end(); itrChild++) {
-                PrintJSONValue(itrChild.key());
-                printf("\n");
-            }*/
-        }
-        
+       ////     printf(itr.key()["blendOp"].asString().c_str());
+       //     /*for (Json::Value::const_iterator itrChild = header.begin(); itrChild != header.end(); itrChild++) {
+       //         PrintJSONValue(itrChild.key());
+       //         printf("\n");
+       //     }*/
+       // }
+       // 
 
-        // example:
-        // 
-        // Node* node;
-        // node = SpawnDoNNode();              
-        // ed::SetNodePosition(node->ID, ImVec2(-238, 504));
-       // Node* node;
+       // // example:
+       // // 
+       // // Node* node;
+       // // node = SpawnDoNNode();              
+       // // ed::SetNodePosition(node->ID, ImVec2(-238, 504));
+       //// Node* node;
     }
 
     //from https://stackoverflow.com/questions/4800605/iterating-through-objects-in-jsoncpp
     // for testing only - remove later
-    void PrintJSONValue(const Json::Value& val)
+    /*void PrintJSONValue(const Json::Value& val)
     {
         if (val.isString()) {
             printf("string(%s)", val.asString().c_str());
@@ -2019,36 +2019,36 @@ struct Example :
         {
             printf("unknown type=[%d]", val.type());
         }
-    }
+    }*/
 
-    // from https://stackoverflow.com/questions/4800605/iterating-through-objects-in-jsoncpp
-    // for testing only - remove later
-    bool PrintJSONTree(const Json::Value& root, unsigned short depth /* = 0 */)
-    {
-        depth += 1;
-        printf(" {type=[%d], size=%d}", root.type(), root.size());
+    //// from https://stackoverflow.com/questions/4800605/iterating-through-objects-in-jsoncpp
+    //// for testing only - remove later
+    //bool PrintJSONTree(const Json::Value& root, unsigned short depth /* = 0 */)
+    //{
+    //    depth += 1;
+    //    printf(" {type=[%d], size=%d}", root.type(), root.size());
 
-        if (root.size() > 0) {
-            printf("\n");
-            for (Json::Value::const_iterator itr = root.begin(); itr != root.end(); itr++) {
-                // Print depth. 
-                for (int tab = 0; tab < depth; tab++) {
-                    printf("-");
-                }
-                printf(" subvalue(");
-                PrintJSONValue(itr.key());
-                printf(") -");
-                PrintJSONTree(*itr, depth);
-            }
-            return true;
-        }
-        else {
-            printf(" ");
-            PrintJSONValue(root);
-            printf("\n");
-        }
-        return true;
-    }
+    //    if (root.size() > 0) {
+    //        printf("\n");
+    //        for (Json::Value::const_iterator itr = root.begin(); itr != root.end(); itr++) {
+    //            // Print depth. 
+    //            for (int tab = 0; tab < depth; tab++) {
+    //                printf("-");
+    //            }
+    //            printf(" subvalue(");
+    //            PrintJSONValue(itr.key());
+    //            printf(") -");
+    //            PrintJSONTree(*itr, depth);
+    //        }
+    //        return true;
+    //    }
+    //    else {
+    //        printf(" ");
+    //        PrintJSONValue(root);
+    //        printf("\n");
+    //    }
+    //    return true;
+    //}
 
     //////////////////////////////////////////////
 
