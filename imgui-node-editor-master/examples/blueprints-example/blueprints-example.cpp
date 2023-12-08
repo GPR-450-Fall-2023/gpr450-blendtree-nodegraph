@@ -436,7 +436,11 @@ struct Example :
     /////////////// Custom Nodes /////////////////
 
     
-
+    /// <summary>
+    /// Node to evaluate a clip controller
+    /// </summary>
+    /// <param name="editor">Current blend node editor window (blend tree)</param>
+    /// <returns>Created node</returns>
     Node* SpawnClipCtrlNode(BlendEditor* editor)
     {
         editor->m_Nodes.emplace_back(GetNextId(), "Evaluate Clip Controller");
@@ -452,6 +456,11 @@ struct Example :
         return &editor->m_Nodes.back();
     }
 
+    /// <summary>
+    /// Node to blend three poses on a 1D axis
+    /// </summary>
+    /// <param name="editor">Current blend node editor window (blend tree)</param>
+    /// <returns>Created node</returns>
     Node* SpawnBlend3Node(BlendEditor* editor)
     {
         editor->m_Nodes.emplace_back(GetNextId(), "Blend 3");
@@ -470,6 +479,11 @@ struct Example :
         return &editor->m_Nodes.back();
     }
 
+    /// <summary>
+    /// Node to lerp between two poses
+    /// </summary>
+    /// <param name="editor">Current blend node editor window (blend tree)</param>
+    /// <returns>Created node</returns>
     Node* SpawnLerpNode(BlendEditor* editor)
     {
         editor->m_Nodes.emplace_back(GetNextId(), "Lerp");
@@ -484,6 +498,11 @@ struct Example :
         return &editor->m_Nodes.back();
     }
 
+    /// <summary>
+    /// Node to handle jump logic
+    /// </summary>
+    /// <param name="editor">Current blend node editor window (blend tree)</param>
+    /// <returns>Created node</returns>
     Node* SpawnHandleJumpNode(BlendEditor* editor)
     {
         editor->m_Nodes.emplace_back(GetNextId(), "Handle Jump");
@@ -504,6 +523,11 @@ struct Example :
         return &editor->m_Nodes.back();
     }
 
+    /// <summary>
+    /// Node to branch based on a condition
+    /// </summary>
+    /// <param name="editor">Current blend node editor window (blend tree)</param>
+    /// <returns>Created node</returns>
     Node* SpawnBranchNode(BlendEditor* editor)
     {
         editor->m_Nodes.emplace_back(GetNextId(), "Branch");
@@ -518,6 +542,11 @@ struct Example :
         return &editor->m_Nodes.back();
     }
 
+    /// <summary>
+    /// Root node at which the tree ends
+    /// </summary>
+    /// <param name="editor">Current blend node editor window (blend tree)</param>
+    /// <returns>Created node</returns>
     Node* SpawnRootNode(BlendEditor* editor)
     {
         editor->m_Nodes.emplace_back(GetNextId(), "Root");
@@ -743,7 +772,11 @@ struct Example :
         
     }
 
-    //Initialize affected bones with defaults (hardcoded)
+    /// <summary>
+    /// Initialize affected bones with defaults
+    /// </summary>
+    /// <param name="editor">Current blend node editor window (blend tree)</param>
+    /// <returns>Created node</returns>
     void InitAffectedBones(BlendEditor* editor)
     {
         editor->affectedBones.clear();
@@ -819,6 +852,10 @@ struct Example :
         };
     }
 
+    /// <summary>
+    /// Contains ImGui logic for displaying the current blend tree editor window
+    /// </summary>
+    /// <param name="io"></param>
     void ShowEditorWindow(ImGuiIO& io)
     {
         ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
