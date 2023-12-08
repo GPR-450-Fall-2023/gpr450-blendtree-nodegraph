@@ -11,6 +11,7 @@
 #include <map>
 #include <algorithm>
 #include <utility>
+#include <unordered_map>
 
 #include "json/json.h"
 #include "json/value.h"
@@ -59,6 +60,78 @@ enum class BlendEditorWindow
     editor = 0,
     save,
     load
+};
+
+//Hardcoded for proof of concpet, don't need to go too deep
+const std::vector<std::string> BONE_NAMES =
+{
+    "mixamorig:Hips",
+    "mixamorig:Spine",
+    "mixamorig:Spine1",
+    "mixamorig:Spine2",
+    "mixamorig:Neck",
+    "mixamorig:Head",
+    "mixamorig:HeadTop_End",
+    "mixamorig:LeftEye",
+    "mixamorig:RightEye",
+    "mixamorig:LeftShoulder",
+    "mixamorig:LeftArm",
+    "mixamorig:LeftForeArm",
+    "mixamorig:LeftHand",
+    "mixamorig:LeftHandThumb1",
+    "mixamorig:LeftHandThumb2",
+    "mixamorig:LeftHandThumb3",
+    "mixamorig:LeftHandThumb4",
+    "mixamorig:LeftHandIndex1",
+    "mixamorig:LeftHandIndex2",
+    "mixamorig:LeftHandIndex3",
+    "mixamorig:LeftHandIndex4",
+    "mixamorig:LeftHandMiddle1",
+    "mixamorig:LeftHandMiddle2",
+    "mixamorig:LeftHandMiddle3",
+    "mixamorig:LeftHandMiddle4",
+    "mixamorig:LeftHandRing1",
+    "mixamorig:LeftHandRing2",
+    "mixamorig:LeftHandRing3",
+    "mixamorig:LeftHandRing4",
+    "mixamorig:LeftHandPinky1",
+    "mixamorig:LeftHandPinky2",
+    "mixamorig:LeftHandPinky3",
+    "mixamorig:LeftHandPinky4",
+    "mixamorig:RightShoulder",
+    "mixamorig:RightArm",
+    "mixamorig:RightForeArm",
+    "mixamorig:RightHand",
+    "mixamorig:RightHandPinky1",
+    "mixamorig:RightHandPinky2",
+    "mixamorig:RightHandPinky3",
+    "mixamorig:RightHandPinky4",
+    "mixamorig:RightHandRing1",
+    "mixamorig:RightHandRing2",
+    "mixamorig:RightHandRing3",
+    "mixamorig:RightHandRing4",
+    "mixamorig:RightHandMiddle1",
+    "mixamorig:RightHandMiddle2",
+    "mixamorig:RightHandMiddle3",
+    "mixamorig:RightHandMiddle4",
+    "mixamorig:RightHandIndex1",
+    "mixamorig:RightHandIndex2",
+    "mixamorig:RightHandIndex3",
+    "mixamorig:RightHandIndex4",
+    "mixamorig:RightHandThumb1",
+    "mixamorig:RightHandThumb2",
+    "mixamorig:RightHandThumb3",
+    "mixamorig:RightHandThumb4",
+    "mixamorig:LeftUpLeg",
+    "mixamorig:LeftLeg",
+    "mixamorig:LeftFoot",
+    "mixamorig:LeftToeBase",
+    "mixamorig:LeftToe_End",
+    "mixamorig:RightUpLeg",
+    "mixamorig:RightLeg",
+    "mixamorig:RightFoot",
+    "mixamorig:RightToeBase",
+    "mixamorig:RightToe_End"
 };
 
 enum class AnimalVar
@@ -221,6 +294,8 @@ struct BlendEditor
 {
     std::vector<Node>    m_Nodes;
     std::vector<Link>    m_Links;
+
+    std::unordered_map<std::string, bool> affectedBones;
 };
 
 struct Example :
@@ -663,6 +738,82 @@ struct Example :
                 BuildNode(&blendEditors[i].m_Nodes[j]);
         }
         
+    }
+
+    //Initialize affected bones with defaults (hardcoded)
+    void InitAffectedBones(BlendEditor* editor)
+    {
+        editor->affectedBones.clear();
+        editor->affectedBones =
+        {
+            {"mixamorig:Hips", true},
+            {"mixamorig:Spine", true},
+            {"mixamorig:Spine1", true},
+            {"mixamorig:Spine2", true},
+            {"mixamorig:Neck", true},
+            {"mixamorig:Head", true},
+            {"mixamorig:HeadTop_End", true},
+            {"mixamorig:LeftEye", true},
+            {"mixamorig:RightEye", true},
+            {"mixamorig:LeftShoulder", true},
+            {"mixamorig:LeftArm", true},
+            {"mixamorig:LeftForeArm", true},
+            {"mixamorig:LeftHand", true},
+            {"mixamorig:LeftHandThumb1", true},
+            {"mixamorig:LeftHandThumb2", true},
+            {"mixamorig:LeftHandThumb3", true},
+            {"mixamorig:LeftHandThumb4", true},
+            {"mixamorig:LeftHandIndex1", true},
+            {"mixamorig:LeftHandIndex2", true},
+            {"mixamorig:LeftHandIndex3", true},
+            {"mixamorig:LeftHandIndex4", true},
+            {"mixamorig:LeftHandMiddle1", true},
+            {"mixamorig:LeftHandMiddle2", true},
+            {"mixamorig:LeftHandMiddle3", true},
+            {"mixamorig:LeftHandMiddle4", true},
+            {"mixamorig:LeftHandRing1", true},
+            {"mixamorig:LeftHandRing2", true},
+            {"mixamorig:LeftHandRing3", true},
+            {"mixamorig:LeftHandRing4", true},
+            {"mixamorig:LeftHandPinky1",  true},
+            {"mixamorig:LeftHandPinky2",  true},
+            {"mixamorig:LeftHandPinky3",  true},
+            {"mixamorig:LeftHandPinky4",  true},
+            {"mixamorig:RightShoulder", true},
+            {"mixamorig:RightArm", true},
+            {"mixamorig:RightForeArm", true},
+            {"mixamorig:RightHand", true},
+            {"mixamorig:RightHandPinky1",  true},
+            {"mixamorig:RightHandPinky2",  true},
+            {"mixamorig:RightHandPinky3",  true},
+            {"mixamorig:RightHandPinky4",  true},
+            {"mixamorig:RightHandRing1", true},
+            {"mixamorig:RightHandRing2", true},
+            {"mixamorig:RightHandRing3", true},
+            {"mixamorig:RightHandRing4", true},
+            {"mixamorig:RightHandMiddle1", true},
+            {"mixamorig:RightHandMiddle2", true},
+            {"mixamorig:RightHandMiddle3", true},
+            {"mixamorig:RightHandMiddle4", true},
+            {"mixamorig:RightHandIndex1", true},
+            {"mixamorig:RightHandIndex2", true},
+            {"mixamorig:RightHandIndex3", true},
+            {"mixamorig:RightHandIndex4", true},
+            {"mixamorig:RightHandThumb1", true},
+            {"mixamorig:RightHandThumb2", true},
+            {"mixamorig:RightHandThumb3", true},
+            {"mixamorig:RightHandThumb4", true},
+            {"mixamorig:LeftUpLeg", true},
+            {"mixamorig:LeftLeg", true},
+            {"mixamorig:LeftFoot", true},
+            {"mixamorig:LeftToeBase", true},
+            {"mixamorig:LeftToe_End", true},
+            {"mixamorig:RightUpLeg", true},
+            {"mixamorig:RightLeg", true},
+            {"mixamorig:RightFoot", true},
+            {"mixamorig:RightToeBase", true},
+            {"mixamorig:RightToe_End", true}
+        };
     }
 
     void ShowEditorWindow(ImGuiIO& io)
@@ -2370,6 +2521,26 @@ struct Example :
         if (ed::HasSelectionChanged())
             ++changeCount;
 
+        //Bone list for animation layering
+        ImGui::GetWindowDrawList()->AddRectFilled(
+            ImGui::GetCursorScreenPos(),
+            ImGui::GetCursorScreenPos() + ImVec2(paneWidth, ImGui::GetTextLineHeight()),
+            ImColor(ImGui::GetStyle().Colors[ImGuiCol_HeaderActive]), ImGui::GetTextLineHeight() * 0.25f);
+        ImGui::Spacing(); ImGui::SameLine();
+        ImGui::TextUnformatted("Affected Bones");
+        ImGui::Indent();
+
+        for (int i = 0; i < blendEditors[currentEditorIndex].affectedBones.size(); i++)
+        {
+            bool* checkbox = &blendEditors[currentEditorIndex].affectedBones[BONE_NAMES[i]];
+            if (ImGui::Checkbox(BONE_NAMES[i].c_str(), checkbox))
+            {
+
+            }
+        }
+
+        ImGui::Unindent();
+
         ImGui::EndChild();
     }
 
@@ -2379,9 +2550,11 @@ struct Example :
 
         ImGuiIO& io = ImGui::GetIO();
 
+        //Editor window options
         if (ImGui::Button("Create New Editor Window"))
         {
             blendEditors.push_back(BlendEditor());
+            InitAffectedBones(&blendEditors[blendEditors.size() - 1]);
         }
 
         ImGui::SameLine();
@@ -2391,7 +2564,7 @@ struct Example :
             blendEditors.pop_back();
         }
 
-        //Get Tab
+        //Tabs
         for (int i = 0; i < blendEditors.size(); i++)
         {
             std::string name = "Editor " + std::to_string(i);
@@ -2459,6 +2632,8 @@ int Main(int argc, char** argv)
 {
     Example example("Blueprints", argc, argv);
     example.blendEditors.push_back(BlendEditor());
+
+    example.InitAffectedBones(&example.blendEditors[0]);
 
     if (example.Create())
         return example.Run();
