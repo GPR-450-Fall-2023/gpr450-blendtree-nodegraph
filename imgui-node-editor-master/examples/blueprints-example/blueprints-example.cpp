@@ -212,6 +212,13 @@ enum class NodeType
     Houdini
 };
 
+enum class DataGroup
+{
+    Spatial,
+    Param,
+    Misc
+};
+
 struct Node;
 
 struct Pin
@@ -219,9 +226,11 @@ struct Pin
     ed::PinId   ID;
     ::Node* Node;
     std::string Name;
-    PinType     Type;
-    PinKind     Kind;
+    PinType     Type; // Flow, float, etc.
+    PinKind     Kind; // Input, output
     std::string data; //Dirty, used to store name of animal variable if it is a dropdown type pin or the string value if it is a string type pin
+
+    DataGroup dataGroup; // How this data will be interpreted in Animal3D (spatial, param, misc)
 
     Pin(int id, const char* name, PinType type) :
         ID(id), Node(nullptr), Name(name), Type(type), Kind(PinKind::Input)
@@ -298,7 +307,42 @@ struct BlendEditor
     std::vector<Node>    m_Nodes;
     std::vector<Link>    m_Links;
 
+    // Connection data maps
+    std::unordered_map<int, Link*> inputPinToLink; // Pin to link connected to it (only works input to output)
+    std::unordered_map<int, Pin*> pinIDToPin; // Pin id to pin reference
+
     std::unordered_map<std::string, bool> affectedBones;
+
+
+    void InitializeConnectionDataMaps()
+    {
+        inputPinToLink.clear();
+        pinIDToPin.clear();
+
+        // Loop through each node and update pinIDToPin with correct mappings
+        for (int i = 0; i < m_Nodes.size(); i++)
+        {
+            Node* node = &(m_Nodes[i]);
+            
+            for (int j = 0; j < node->Inputs.size(); j++)
+            {
+                pinIDToPin.insert(std::make_pair(node->Inputs[j].ID.Get(), &(node->Inputs[j])));
+            }
+
+            for (int j = 0; j < node->Outputs.size(); j++)
+            {
+                pinIDToPin.insert(std::make_pair(node->Outputs[j].ID.Get(), &(node->Outputs[j])));
+            }
+        }
+
+        // Loop through each link and map ending to inputPinToLink
+        for (int i = 0; i < m_Links.size(); i++)
+        {
+            Link* link = &(m_Links[i]);
+
+            inputPinToLink.insert(std::make_pair(link->EndPinID.Get(), link));
+        }
+    }
 };
 
 struct Example :
@@ -1962,6 +2006,8 @@ struct Example :
 
         for (int treeIndex = 0; treeIndex < blendEditors.size(); treeIndex++)
         {
+            blendEditors[treeIndex].InitializeConnectionDataMaps();
+
             //Print blend tree name
             fout << "\t\"blendTree" + std::to_string(treeIndex) + "\": {\n\n";
 
