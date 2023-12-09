@@ -217,7 +217,8 @@ enum class DataGroup
 {
     Spatial,
     Param,
-    Misc
+    Misc,
+    ID
 };
 
 struct Node;
@@ -233,8 +234,8 @@ struct Pin
 
     DataGroup dataGroup; // How this data will be interpreted in Animal3D (spatial, param, misc)
 
-    Pin(int id, const char* name, PinType type) :
-        ID(id), Node(nullptr), Name(name), Type(type), Kind(PinKind::Input)
+    Pin(int id, const char* name, PinType type, DataGroup group) :
+        ID(id), Node(nullptr), Name(name), Type(type), Kind(PinKind::Input), dataGroup(group)
     {
     }
 };
@@ -249,11 +250,13 @@ struct Node
     NodeType Type;
     ImVec2 Size;
 
+    std::string blendOp;
+
     std::string State;
     std::string SavedState;
 
-    Node(int id, const char* name, ImColor color = ImColor(255, 255, 255)) :
-        ID(id), Name(name), Color(color), Type(NodeType::Blueprint), Size(0, 0)
+    Node(int id, const char* name, std::string blendOperation, ImColor color = ImColor(255, 255, 255)) :
+        ID(id), Name(name), Color(color), Type(NodeType::Blueprint), Size(0, 0), blendOp(blendOperation)
     {
     }
 };
@@ -499,13 +502,13 @@ struct Example :
     /// <returns>Created node</returns>
     Node* SpawnClipCtrlNode(BlendEditor* editor)
     {
-        editor->m_Nodes.emplace_back(GetNextId(), "Evaluate Clip Controller");
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "ID", PinType::String);
+        editor->m_Nodes.emplace_back(GetNextId(), "Evaluate Clip Controller", "blendop_evaluate_clip_controller");
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "ID", PinType::String, DataGroup::ID);
         /*m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Clip Ctrl", PinType::Object);
         m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Hierarchy Pose Group", PinType::Object);*/
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Clip Ctrl", PinType::Dropdown);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Hierarchy Pose Group", PinType::Dropdown);
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output Pose", PinType::Flow);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Clip Ctrl", PinType::Dropdown, DataGroup::Misc);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input Hierarchy Pose Group", PinType::Dropdown, DataGroup::Misc);
+        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output Pose", PinType::Flow, DataGroup::Spatial);
 
         BuildNode(&editor->m_Nodes.back());
 
@@ -519,16 +522,16 @@ struct Example :
     /// <returns>Created node</returns>
     Node* SpawnBlend3Node(BlendEditor* editor)
     {
-        editor->m_Nodes.emplace_back(GetNextId(), "Blend 3");
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "ID", PinType::String);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Blend Param", PinType::Dropdown);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Threshold A", PinType::Dropdown);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Threshold B", PinType::Dropdown);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Threshold C", PinType::Dropdown);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input A", PinType::Flow);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input B", PinType::Flow);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input C", PinType::Flow);
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output Pose", PinType::Flow);
+        editor->m_Nodes.emplace_back(GetNextId(), "Blend 3", "blendop_blend_3");
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "ID", PinType::String, DataGroup::ID);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Blend Param", PinType::Dropdown, DataGroup::Param);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Threshold A", PinType::Dropdown, DataGroup::Param);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Threshold B", PinType::Dropdown, DataGroup::Param);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Threshold C", PinType::Dropdown, DataGroup::Param);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input A", PinType::Flow, DataGroup::Spatial);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input B", PinType::Flow, DataGroup::Spatial);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input C", PinType::Flow, DataGroup::Spatial);
+        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output Pose", PinType::Flow, DataGroup::Spatial);
 
         BuildNode(&editor->m_Nodes.back());
 
@@ -542,12 +545,12 @@ struct Example :
     /// <returns>Created node</returns>
     Node* SpawnLerpNode(BlendEditor* editor)
     {
-        editor->m_Nodes.emplace_back(GetNextId(), "Lerp");
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "ID", PinType::String);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Magnitude", PinType::Dropdown);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input A", PinType::Flow);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input B", PinType::Flow);
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output Pose", PinType::Flow);
+        editor->m_Nodes.emplace_back(GetNextId(), "Lerp", "blendop_lerp");
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "ID", PinType::String, DataGroup::ID);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Magnitude", PinType::Dropdown, DataGroup::Param);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input A", PinType::Flow, DataGroup::Spatial);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input B", PinType::Flow, DataGroup::Spatial);
+        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output Pose", PinType::Flow, DataGroup::Spatial);
 
         BuildNode(&editor->m_Nodes.back());
 
@@ -561,18 +564,18 @@ struct Example :
     /// <returns>Created node</returns>
     Node* SpawnHandleJumpNode(BlendEditor* editor)
     {
-        editor->m_Nodes.emplace_back(GetNextId(), "Handle Jump");
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "ID", PinType::String);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Duration", PinType::Dropdown);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Height", PinType::Dropdown);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Fade In Time", PinType::Dropdown);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Fade Out Time", PinType::Dropdown);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Time Since Jump", PinType::Dropdown);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Lerp Param", PinType::Dropdown);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Is Jumping", PinType::Dropdown);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Control Node", PinType::Dropdown);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input 1", PinType::Flow);
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output Pose", PinType::Flow);
+        editor->m_Nodes.emplace_back(GetNextId(), "Handle Jump", "blendop_handle_jump");
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "ID", PinType::String, DataGroup::ID);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Duration", PinType::Dropdown, DataGroup::Param);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Height", PinType::Dropdown, DataGroup::Param);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Fade In Time", PinType::Dropdown, DataGroup::Param);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Fade Out Time", PinType::Dropdown, DataGroup::Param);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Time Since Jump", PinType::Dropdown, DataGroup::Misc);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Lerp Param", PinType::Dropdown, DataGroup::Misc);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Is Jumping", PinType::Dropdown, DataGroup::Misc);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Control Node", PinType::Dropdown, DataGroup::Misc);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Input 1", PinType::Flow, DataGroup::Spatial);
+        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output Pose", PinType::Flow, DataGroup::Spatial);
 
         BuildNode(&editor->m_Nodes.back());
 
@@ -586,12 +589,12 @@ struct Example :
     /// <returns>Created node</returns>
     Node* SpawnBranchNode(BlendEditor* editor)
     {
-        editor->m_Nodes.emplace_back(GetNextId(), "Branch");
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "ID", PinType::String);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Condition", PinType::Dropdown);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "True", PinType::Flow);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "False", PinType::Flow);
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output Pose", PinType::Flow);
+        editor->m_Nodes.emplace_back(GetNextId(), "Branch", "blendop_bool_branch");
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "ID", PinType::String, DataGroup::ID);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Condition", PinType::Dropdown, DataGroup::Misc);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "True", PinType::Flow, DataGroup::Spatial);
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "False", PinType::Flow, DataGroup::Spatial);
+        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Output Pose", PinType::Flow, DataGroup::Spatial);
 
         BuildNode(&editor->m_Nodes.back());
 
@@ -605,8 +608,8 @@ struct Example :
     /// <returns>Created node</returns>
     Node* SpawnRootNode(BlendEditor* editor)
     {
-        editor->m_Nodes.emplace_back(GetNextId(), "Root");
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Root Pose", PinType::Flow);
+        editor->m_Nodes.emplace_back(GetNextId(), "Root", "");
+        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Root Pose", PinType::Flow, DataGroup::ID);
 
         BuildNode(&editor->m_Nodes.back());
 
@@ -615,208 +618,208 @@ struct Example :
 
     //////////////////////////////////////////////
 
-    Node* SpawnInputActionNode(BlendEditor* editor)
-    {
-        editor->m_Nodes.emplace_back(GetNextId(), "InputAction Fire", ImColor(255, 128, 128));
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Delegate);
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Pressed", PinType::Flow);
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Released", PinType::Flow);
+    //Node* SpawnInputActionNode(BlendEditor* editor)
+    //{
+    //    editor->m_Nodes.emplace_back(GetNextId(), "InputAction Fire", ImColor(255, 128, 128));
+    //    editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Delegate);
+    //    editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Pressed", PinType::Flow);
+    //    editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Released", PinType::Flow);
 
-        BuildNode(&editor->m_Nodes.back());
+    //    BuildNode(&editor->m_Nodes.back());
 
-        return &editor->m_Nodes.back();
-    }
+    //    return &editor->m_Nodes.back();
+    //}
 
-    /*Node* SpawnBranchNode()
-    {
-        m_Nodes.emplace_back(GetNextId(), "Branch");
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
-        m_Nodes.back().Inputs.emplace_back(GetNextId(), "Condition", PinType::Bool);
-        m_Nodes.back().Outputs.emplace_back(GetNextId(), "True", PinType::Flow);
-        m_Nodes.back().Outputs.emplace_back(GetNextId(), "False", PinType::Flow);
+    ///*Node* SpawnBranchNode()
+    //{
+    //    m_Nodes.emplace_back(GetNextId(), "Branch");
+    //    m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
+    //    m_Nodes.back().Inputs.emplace_back(GetNextId(), "Condition", PinType::Bool);
+    //    m_Nodes.back().Outputs.emplace_back(GetNextId(), "True", PinType::Flow);
+    //    m_Nodes.back().Outputs.emplace_back(GetNextId(), "False", PinType::Flow);
 
-        BuildNode(&m_Nodes.back());
+    //    BuildNode(&m_Nodes.back());
 
-        return &m_Nodes.back();
-    }*/
+    //    return &m_Nodes.back();
+    //}*/
 
-    Node* SpawnDoNNode(BlendEditor* editor)
-    {
-        editor->m_Nodes.emplace_back(GetNextId(), "Do N");
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Enter", PinType::Flow);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "N", PinType::Int);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Reset", PinType::Flow);
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Exit", PinType::Flow);
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Counter", PinType::Int);
+    //Node* SpawnDoNNode(BlendEditor* editor)
+    //{
+    //    editor->m_Nodes.emplace_back(GetNextId(), "Do N");
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Enter", PinType::Flow);
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "N", PinType::Int);
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Reset", PinType::Flow);
+    //    editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Exit", PinType::Flow);
+    //    editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Counter", PinType::Int);
 
-        BuildNode(&editor->m_Nodes.back());
+    //    BuildNode(&editor->m_Nodes.back());
 
-        return &editor->m_Nodes.back();
-    }
+    //    return &editor->m_Nodes.back();
+    //}
 
-    Node* SpawnOutputActionNode(BlendEditor* editor)
-    {
-        editor->m_Nodes.emplace_back(GetNextId(), "OutputAction");
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Sample", PinType::Float);
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Condition", PinType::Bool);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Event", PinType::Delegate);
+    //Node* SpawnOutputActionNode(BlendEditor* editor)
+    //{
+    //    editor->m_Nodes.emplace_back(GetNextId(), "OutputAction");
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Sample", PinType::Float);
+    //    editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Condition", PinType::Bool);
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Event", PinType::Delegate);
 
-        BuildNode(&editor->m_Nodes.back());
+    //    BuildNode(&editor->m_Nodes.back());
 
-        return &editor->m_Nodes.back();
-    }
+    //    return &editor->m_Nodes.back();
+    //}
 
-    Node* SpawnPrintStringNode(BlendEditor* editor)
-    {
-        editor->m_Nodes.emplace_back(GetNextId(), "Print String");
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "In String", PinType::String);
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Flow);
+    //Node* SpawnPrintStringNode(BlendEditor* editor)
+    //{
+    //    editor->m_Nodes.emplace_back(GetNextId(), "Print String");
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "In String", PinType::String);
+    //    editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Flow);
 
-        BuildNode(&editor->m_Nodes.back());
+    //    BuildNode(&editor->m_Nodes.back());
 
-        return &editor->m_Nodes.back();
-    }
+    //    return &editor->m_Nodes.back();
+    //}
 
-    Node* SpawnStringNode(BlendEditor* editor)
-    {
-        editor->m_Nodes.emplace_back(GetNextId(), "", ImColor(128, 195, 248));
-        editor->m_Nodes.back().Type = NodeType::Simple;
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "String", PinType::String);
+    //Node* SpawnStringNode(BlendEditor* editor)
+    //{
+    //    editor->m_Nodes.emplace_back(GetNextId(), "", ImColor(128, 195, 248));
+    //    editor->m_Nodes.back().Type = NodeType::Simple;
+    //    editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "String", PinType::String);
 
-        BuildNode(&editor->m_Nodes.back());
+    //    BuildNode(&editor->m_Nodes.back());
 
-        return &editor->m_Nodes.back();
-    }
+    //    return &editor->m_Nodes.back();
+    //}
 
-    Node* SpawnSetTimerNode(BlendEditor* editor)
-    {
-        editor->m_Nodes.emplace_back(GetNextId(), "Set Timer", ImColor(128, 195, 248));
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Object", PinType::Object);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Function Name", PinType::Function);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Time", PinType::Float);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Looping", PinType::Bool);
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Flow);
+    //Node* SpawnSetTimerNode(BlendEditor* editor)
+    //{
+    //    editor->m_Nodes.emplace_back(GetNextId(), "Set Timer", ImColor(128, 195, 248));
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Object", PinType::Object);
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Function Name", PinType::Function);
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Time", PinType::Float);
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Looping", PinType::Bool);
+    //    editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Flow);
 
-        BuildNode(&editor->m_Nodes.back());
+    //    BuildNode(&editor->m_Nodes.back());
 
-        return &editor->m_Nodes.back();
-    }
+    //    return &editor->m_Nodes.back();
+    //}
 
-    Node* SpawnLessNode(BlendEditor* editor)
-    {
-        editor->m_Nodes.emplace_back(GetNextId(), "<", ImColor(128, 195, 248));
-        editor->m_Nodes.back().Type = NodeType::Simple;
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Float);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Float);
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Float);
+    //Node* SpawnLessNode(BlendEditor* editor)
+    //{
+    //    editor->m_Nodes.emplace_back(GetNextId(), "<", ImColor(128, 195, 248));
+    //    editor->m_Nodes.back().Type = NodeType::Simple;
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Float);
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Float);
+    //    editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Float);
 
-        BuildNode(&editor->m_Nodes.back());
+    //    BuildNode(&editor->m_Nodes.back());
 
-        return &editor->m_Nodes.back();
-    }
+    //    return &editor->m_Nodes.back();
+    //}
 
-    Node* SpawnWeirdNode(BlendEditor* editor)
-    {
-        editor->m_Nodes.emplace_back(GetNextId(), "o.O", ImColor(128, 195, 248));
-        editor->m_Nodes.back().Type = NodeType::Simple;
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Float);
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Float);
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Float);
+    //Node* SpawnWeirdNode(BlendEditor* editor)
+    //{
+    //    editor->m_Nodes.emplace_back(GetNextId(), "o.O", ImColor(128, 195, 248));
+    //    editor->m_Nodes.back().Type = NodeType::Simple;
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Float);
+    //    editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Float);
+    //    editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Float);
 
-        BuildNode(&editor->m_Nodes.back());
+    //    BuildNode(&editor->m_Nodes.back());
 
-        return &editor->m_Nodes.back();
-    }
+    //    return &editor->m_Nodes.back();
+    //}
 
-    Node* SpawnTraceByChannelNode(BlendEditor* editor)
-    {
-        editor->m_Nodes.emplace_back(GetNextId(), "Single Line Trace by Channel", ImColor(255, 128, 64));
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Start", PinType::Flow);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "End", PinType::Int);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Trace Channel", PinType::Float);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Trace Complex", PinType::Bool);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Actors to Ignore", PinType::Int);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Draw Debug Type", PinType::Bool);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Ignore Self", PinType::Bool);
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Flow);
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Out Hit", PinType::Float);
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Return Value", PinType::Bool);
+    //Node* SpawnTraceByChannelNode(BlendEditor* editor)
+    //{
+    //    editor->m_Nodes.emplace_back(GetNextId(), "Single Line Trace by Channel", ImColor(255, 128, 64));
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Start", PinType::Flow);
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "End", PinType::Int);
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Trace Channel", PinType::Float);
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Trace Complex", PinType::Bool);
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Actors to Ignore", PinType::Int);
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Draw Debug Type", PinType::Bool);
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "Ignore Self", PinType::Bool);
+    //    editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Flow);
+    //    editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Out Hit", PinType::Float);
+    //    editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "Return Value", PinType::Bool);
 
-        BuildNode(&editor->m_Nodes.back());
+    //    BuildNode(&editor->m_Nodes.back());
 
-        return &editor->m_Nodes.back();
-    }
+    //    return &editor->m_Nodes.back();
+    //}
 
-    Node* SpawnTreeSequenceNode(BlendEditor* editor)
-    {
-        editor->m_Nodes.emplace_back(GetNextId(), "Sequence");
-        editor->m_Nodes.back().Type = NodeType::Tree;
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Flow);
+    //Node* SpawnTreeSequenceNode(BlendEditor* editor)
+    //{
+    //    editor->m_Nodes.emplace_back(GetNextId(), "Sequence");
+    //    editor->m_Nodes.back().Type = NodeType::Tree;
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
+    //    editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Flow);
 
-        BuildNode(&editor->m_Nodes.back());
+    //    BuildNode(&editor->m_Nodes.back());
 
-        return &editor->m_Nodes.back();
-    }
+    //    return &editor->m_Nodes.back();
+    //}
 
-    Node* SpawnTreeTaskNode(BlendEditor* editor)
-    {
-        editor->m_Nodes.emplace_back(GetNextId(), "Move To");
-        editor->m_Nodes.back().Type = NodeType::Tree;
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
-        
-        BuildNode(&editor->m_Nodes.back());
+    //Node* SpawnTreeTaskNode(BlendEditor* editor)
+    //{
+    //    editor->m_Nodes.emplace_back(GetNextId(), "Move To");
+    //    editor->m_Nodes.back().Type = NodeType::Tree;
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
+    //    
+    //    BuildNode(&editor->m_Nodes.back());
 
-        return &editor->m_Nodes.back();
-    }
+    //    return &editor->m_Nodes.back();
+    //}
 
-    Node* SpawnTreeTask2Node(BlendEditor* editor)
-    {
-        editor->m_Nodes.emplace_back(GetNextId(), "Random Wait");
-        editor->m_Nodes.back().Type = NodeType::Tree;
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
+    //Node* SpawnTreeTask2Node(BlendEditor* editor)
+    //{
+    //    editor->m_Nodes.emplace_back(GetNextId(), "Random Wait");
+    //    editor->m_Nodes.back().Type = NodeType::Tree;
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
 
-        BuildNode(&editor->m_Nodes.back());
+    //    BuildNode(&editor->m_Nodes.back());
 
-        return &editor->m_Nodes.back();
-    }
+    //    return &editor->m_Nodes.back();
+    //}
 
-    Node* SpawnComment(BlendEditor* editor)
-    {
-        editor->m_Nodes.emplace_back(GetNextId(), "Test Comment");
-        editor->m_Nodes.back().Type = NodeType::Comment;
-        editor->m_Nodes.back().Size = ImVec2(300, 200);
+    //Node* SpawnComment(BlendEditor* editor)
+    //{
+    //    editor->m_Nodes.emplace_back(GetNextId(), "Test Comment");
+    //    editor->m_Nodes.back().Type = NodeType::Comment;
+    //    editor->m_Nodes.back().Size = ImVec2(300, 200);
 
-        return &editor->m_Nodes.back();
-    }
+    //    return &editor->m_Nodes.back();
+    //}
 
-    Node* SpawnHoudiniTransformNode(BlendEditor* editor)
-    {
-        editor->m_Nodes.emplace_back(GetNextId(), "Transform");
-        editor->m_Nodes.back().Type = NodeType::Houdini;
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Flow);
-        
-        BuildNode(&editor->m_Nodes.back());
+    //Node* SpawnHoudiniTransformNode(BlendEditor* editor)
+    //{
+    //    editor->m_Nodes.emplace_back(GetNextId(), "Transform");
+    //    editor->m_Nodes.back().Type = NodeType::Houdini;
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
+    //    editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Flow);
+    //    
+    //    BuildNode(&editor->m_Nodes.back());
 
-        return &editor->m_Nodes.back();
-    }
+    //    return &editor->m_Nodes.back();
+    //}
 
-    Node* SpawnHoudiniGroupNode(BlendEditor* editor)
-    {
-        editor->m_Nodes.emplace_back(GetNextId(), "Group");
-        editor->m_Nodes.back().Type = NodeType::Houdini;
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
-        editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
-        editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Flow);
+    //Node* SpawnHoudiniGroupNode(BlendEditor* editor)
+    //{
+    //    editor->m_Nodes.emplace_back(GetNextId(), "Group");
+    //    editor->m_Nodes.back().Type = NodeType::Houdini;
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
+    //    editor->m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
+    //    editor->m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Flow);
 
-        BuildNode(&editor->m_Nodes.back());
+    //    BuildNode(&editor->m_Nodes.back());
 
-        return &editor->m_Nodes.back();
-    }
+    //    return &editor->m_Nodes.back();
+    //}
 
     void BuildNodes()
     {
@@ -1819,8 +1822,8 @@ struct Example :
             if (ImGui::MenuItem("Random Wait"))
                 node = SpawnTreeTask2Node();
             ImGui::Separator();*/
-            if (ImGui::MenuItem("String"))
-                node = SpawnStringNode(&blendEditors[currentEditorIndex]);
+            /*if (ImGui::MenuItem("String"))
+                node = SpawnStringNode(&blendEditors[currentEditorIndex]);*/
             /*ImGui::Separator();
             if (ImGui::MenuItem("Transform"))
                 node = SpawnHoudiniTransformNode();
@@ -1990,21 +1993,89 @@ struct Example :
             existingTreeStr = GetTreeString(connectedPin->Node, blendGraph, existingTreeStr, visitedNodes);
         }
 
-        existingTreeStr += node->Name + "\n";
+        bool lastDataEntry = node->Inputs.size() <= 1;
+        bool isRoot = false;
+
+        std::string blendOp = node->blendOp;
+
+        // Root will have no id, replace with correct json key "root"
+        std::string id = node->Inputs[0].data;
+        if (node->Inputs[0].data == "")
+        {
+            id = "root";
+            lastDataEntry = true;
+            isRoot = true;
+            blendOp = blendGraph.GetOutputConnectedPin(&(node->Inputs[0]))->Node->Inputs[0].data; // Get name of connected node
+        }
+
+        existingTreeStr += "\t\t\"" + id + "\": {\n";
+        existingTreeStr += "\t\t\t\"blendOp\": \"" + blendOp + "\"";
+
+        if (!lastDataEntry)
+        {
+            existingTreeStr += ",";
+        }
+
+        existingTreeStr += "\n";
+
+        int numSpatial = 0;
+        int numParam = 0;
+        int numMisc = 0;
+
+        for (int i = 1; i < node->Inputs.size(); i++)
+        {
+            //existingTreeStr += node->Inputs[i].data
+
+            if (i + 1 >= node->Inputs.size()) lastDataEntry = true;
+
+            existingTreeStr += "\t\t\t\"";
+
+            switch (node->Inputs[i].dataGroup)
+            {
+                case DataGroup::Spatial:
+                {
+                    existingTreeStr += "spatialDataNodes" + std::to_string(numSpatial);
+                    numSpatial++;
+                    break;
+                }
+
+                case DataGroup::Param:
+                {
+                    existingTreeStr += "paramData" + std::to_string(numParam);
+                    numParam++;
+                    break;
+                }
+
+                case DataGroup::Misc:
+                {
+                    existingTreeStr += "miscData" + std::to_string(numMisc);
+                    numMisc++;
+                    break;
+                }
+            }
+
+            // Add animal_var_....
+            existingTreeStr += "\": ";
+            existingTreeStr += "\"" + node->Inputs[i].data + "\"";
+
+            if (!lastDataEntry)
+            {
+                existingTreeStr += ",";
+            }
+
+            existingTreeStr += "\n";
+        }
+
+        existingTreeStr += "\t\t}";
+
+        if (!isRoot)
+        {
+            existingTreeStr += ",";
+        }
+
+        existingTreeStr += "\n\n";
 
         return existingTreeStr;
-
-
-        /*if (node->Name == "Root")
-        {
-            
-        }
-        else
-        {
-            return "";
-        }*/
-
-        return "";
     }
 
     std::string GetTreeString(Node* node, BlendEditor blendGraph)
