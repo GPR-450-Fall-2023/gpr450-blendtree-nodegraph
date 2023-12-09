@@ -2098,7 +2098,8 @@ struct Example :
     {
         std::ofstream fout;
 
-        fout.open("../../../../../../BlendGraphOutput/blendtree.json");
+        fout.open("blendtree.json");
+        //fout.open("../../../../../../BlendGraphOutput/blendtree.json");
 
         //Failed to save
         if (!fout || fout.fail())
@@ -2153,13 +2154,14 @@ struct Example :
             a = "23";
 
             //add deepest node (root);
+            fout << "\t}\n";
         }
-
-        fout << "\t}\n";
 
         fout << "}";
 
         fout.close();
+
+        return true;
 
         // get nodes from m_Nodes
 
@@ -2369,13 +2371,15 @@ struct Example :
         ed::SetCurrentEditor(m_Editor);
 
         Node* node;
-        node = SpawnRootNode(&blendEditors[currentEditorIndex]);         ed::SetNodePosition(node->ID, ImVec2(0, 500));          //0
 
-        node = SpawnBranchNode(&blendEditors[currentEditorIndex]);       ed::SetNodePosition(node->ID, ImVec2(-500, 500));       //1
+        //Create legs/torso blend tree
+        node = SpawnRootNode(&blendEditors[0]);         ed::SetNodePosition(node->ID, ImVec2(0, 500));          //0
+
+        node = SpawnBranchNode(&blendEditors[0]);       ed::SetNodePosition(node->ID, ImVec2(-500, 500));       //1
         node->Inputs[0].data = "jumpBranchNode";
         node->Inputs[1].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_isJumping];
 
-        node = SpawnHandleJumpNode(&blendEditors[currentEditorIndex]);   ed::SetNodePosition(node->ID, ImVec2(-1000, 250));      //2
+        node = SpawnHandleJumpNode(&blendEditors[0]);   ed::SetNodePosition(node->ID, ImVec2(-1000, 250));      //2
         node->Inputs[0].data = "handleJumpNode";
         node->Inputs[1].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_jumpDuration];
         node->Inputs[2].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_jumpHeight];
@@ -2386,58 +2390,89 @@ struct Example :
         node->Inputs[7].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_isJumping];
         node->Inputs[8].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_ctrlNode];
 
-        node = SpawnLerpNode(&blendEditors[currentEditorIndex]);         ed::SetNodePosition(node->ID, ImVec2(-1500, 500));      //3
+        node = SpawnLerpNode(&blendEditors[0]);         ed::SetNodePosition(node->ID, ImVec2(-1500, 500));      //3
         node->Inputs[0].data = "jumpGroundLerpNode";
         node->Inputs[1].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_jumpLerpParam];
 
-        node = SpawnBlend3Node(&blendEditors[currentEditorIndex]);       ed::SetNodePosition(node->ID, ImVec2(-2000, 750));      //4
+        node = SpawnBlend3Node(&blendEditors[0]);       ed::SetNodePosition(node->ID, ImVec2(-2000, 750));      //4
         node->Inputs[0].data = "blendGroundPoseNode";
         node->Inputs[1].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_ctrlVelocityMagnitude];
         node->Inputs[2].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_idleBlendThreshold];
         node->Inputs[3].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_walkBlendThreshold];
         node->Inputs[4].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_runBlendThreshold];
 
-        node = SpawnClipCtrlNode(&blendEditors[currentEditorIndex]);     ed::SetNodePosition(node->ID, ImVec2(-2200, 500));      //5
+        node = SpawnClipCtrlNode(&blendEditors[0]);     ed::SetNodePosition(node->ID, ImVec2(-2200, 500));      //5
         node->Inputs[0].data = "jumpCCNode";
         node->Inputs[1].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_jumpClipCtrl];
         node->Inputs[2].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_hierarchyPoseGroup_skel];
 
-        node = SpawnClipCtrlNode(&blendEditors[currentEditorIndex]);     ed::SetNodePosition(node->ID, ImVec2(-2700, 700));      //6
+        node = SpawnClipCtrlNode(&blendEditors[0]);     ed::SetNodePosition(node->ID, ImVec2(-2700, 700));      //6
         node->Inputs[0].data = "idleCCNode";
         node->Inputs[1].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_idleClipCtrl];
         node->Inputs[2].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_hierarchyPoseGroup_skel];
 
-        node = SpawnClipCtrlNode(&blendEditors[currentEditorIndex]);     ed::SetNodePosition(node->ID, ImVec2(-2700, 850));      //7
+        node = SpawnClipCtrlNode(&blendEditors[0]);     ed::SetNodePosition(node->ID, ImVec2(-2700, 850));      //7
         node->Inputs[0].data = "walkCCNode";
         node->Inputs[1].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_walkClipCtrl];
         node->Inputs[2].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_hierarchyPoseGroup_skel];
 
-        node = SpawnClipCtrlNode(&blendEditors[currentEditorIndex]);     ed::SetNodePosition(node->ID, ImVec2(-2700, 1000));     //8
+        node = SpawnClipCtrlNode(&blendEditors[0]);     ed::SetNodePosition(node->ID, ImVec2(-2700, 1000));     //8
         node->Inputs[0].data = "runCCNode";
         node->Inputs[1].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_runClipCtrl];
         node->Inputs[2].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_hierarchyPoseGroup_skel];
 
+        //Disable arm/hand bones
+        for (int i = 9; i < 57; i++)
+        {
+            blendEditors[0].affectedBones[BONE_NAMES[i]] = false;
+        }
+
+
+        //Create arms blend tree
+        node = SpawnRootNode(&blendEditors[1]);         ed::SetNodePosition(node->ID, ImVec2(0, 500));          //0
+
+        node = SpawnClipCtrlNode(&blendEditors[1]);     ed::SetNodePosition(node->ID, ImVec2(-1000, 500));      //5
+        node->Inputs[0].data = "upperJumpNode";
+        node->Inputs[1].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_jumpClipCtrl];
+        node->Inputs[2].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_hierarchyPoseGroup_skel];
+
+        //Disable any bones that aren't in the arms/hands
+        for (int i = 0; i < 9; i++)
+        {
+            blendEditors[1].affectedBones[BONE_NAMES[i]] = false;
+        }
+        for (int i = 57; i < BONE_NAMES.size(); i++)
+        {
+            blendEditors[1].affectedBones[BONE_NAMES[i]] = false;
+        }
 
         ed::NavigateToContent();
 
         BuildNodes();
 
-        std::vector<Link>* links = &blendEditors[currentEditorIndex].m_Links;
+        std::vector<Link>* links = &blendEditors[0].m_Links;
 
-        links->push_back(Link(GetNextLinkId(), blendEditors[currentEditorIndex].m_Nodes[1].Outputs[0].ID, blendEditors[currentEditorIndex].m_Nodes[0].Inputs[0].ID));
+        links->push_back(Link(GetNextLinkId(), blendEditors[0].m_Nodes[1].Outputs[0].ID, blendEditors[0].m_Nodes[0].Inputs[0].ID));
 
-        links->push_back(Link(GetNextLinkId(), blendEditors[currentEditorIndex].m_Nodes[2].Outputs[0].ID, blendEditors[currentEditorIndex].m_Nodes[1].Inputs[2].ID));
+        links->push_back(Link(GetNextLinkId(), blendEditors[0].m_Nodes[2].Outputs[0].ID, blendEditors[0].m_Nodes[1].Inputs[2].ID));
 
-        links->push_back(Link(GetNextLinkId(), blendEditors[currentEditorIndex].m_Nodes[3].Outputs[0].ID, blendEditors[currentEditorIndex].m_Nodes[2].Inputs[9].ID));
+        links->push_back(Link(GetNextLinkId(), blendEditors[0].m_Nodes[3].Outputs[0].ID, blendEditors[0].m_Nodes[2].Inputs[9].ID));
 
-        links->push_back(Link(GetNextLinkId(), blendEditors[currentEditorIndex].m_Nodes[4].Outputs[0].ID, blendEditors[currentEditorIndex].m_Nodes[3].Inputs[3].ID));
-        links->push_back(Link(GetNextLinkId(), blendEditors[currentEditorIndex].m_Nodes[4].Outputs[0].ID, blendEditors[currentEditorIndex].m_Nodes[1].Inputs[3].ID));
+        links->push_back(Link(GetNextLinkId(), blendEditors[0].m_Nodes[4].Outputs[0].ID, blendEditors[0].m_Nodes[3].Inputs[3].ID));
+        links->push_back(Link(GetNextLinkId(), blendEditors[0].m_Nodes[4].Outputs[0].ID, blendEditors[0].m_Nodes[1].Inputs[3].ID));
 
-        links->push_back(Link(GetNextLinkId(), blendEditors[currentEditorIndex].m_Nodes[5].Outputs[0].ID, blendEditors[currentEditorIndex].m_Nodes[3].Inputs[2].ID));
+        links->push_back(Link(GetNextLinkId(), blendEditors[0].m_Nodes[5].Outputs[0].ID, blendEditors[0].m_Nodes[3].Inputs[2].ID));
 
-        links->push_back(Link(GetNextLinkId(), blendEditors[currentEditorIndex].m_Nodes[6].Outputs[0].ID, blendEditors[currentEditorIndex].m_Nodes[4].Inputs[5].ID));
-        links->push_back(Link(GetNextLinkId(), blendEditors[currentEditorIndex].m_Nodes[7].Outputs[0].ID, blendEditors[currentEditorIndex].m_Nodes[4].Inputs[6].ID));
-        links->push_back(Link(GetNextLinkId(), blendEditors[currentEditorIndex].m_Nodes[8].Outputs[0].ID, blendEditors[currentEditorIndex].m_Nodes[4].Inputs[7].ID));
+        links->push_back(Link(GetNextLinkId(), blendEditors[0].m_Nodes[6].Outputs[0].ID, blendEditors[0].m_Nodes[4].Inputs[5].ID));
+        links->push_back(Link(GetNextLinkId(), blendEditors[0].m_Nodes[7].Outputs[0].ID, blendEditors[0].m_Nodes[4].Inputs[6].ID));
+        links->push_back(Link(GetNextLinkId(), blendEditors[0].m_Nodes[8].Outputs[0].ID, blendEditors[0].m_Nodes[4].Inputs[7].ID));
+
+
+
+        links = &blendEditors[1].m_Links;
+
+        links->push_back(Link(GetNextLinkId(), blendEditors[1].m_Nodes[1].Outputs[0].ID, blendEditors[1].m_Nodes[0].Inputs[0].ID));
+
         /*node = SpawnInputActionNode();      ed::SetNodePosition(node->ID, ImVec2(-252, 220));
         node = SpawnBranchNode();           ed::SetNodePosition(node->ID, ImVec2(-300, 351));
         node = SpawnDoNNode();              ed::SetNodePosition(node->ID, ImVec2(-238, 504));
@@ -2972,8 +3007,10 @@ int Main(int argc, char** argv)
 {
     Example example("Blueprints", argc, argv);
     example.blendEditors.push_back(BlendEditor());
+    example.blendEditors.push_back(BlendEditor());
 
     example.InitAffectedBones(&example.blendEditors[0]);
+    example.InitAffectedBones(&example.blendEditors[1]);
 
     if (example.Create())
         return example.Run();
