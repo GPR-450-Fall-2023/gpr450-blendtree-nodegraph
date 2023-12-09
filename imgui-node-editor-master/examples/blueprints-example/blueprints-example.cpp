@@ -2056,7 +2056,17 @@ struct Example :
 
             // Add animal_var_....
             existingTreeStr += "\": ";
-            existingTreeStr += "\"" + node->Inputs[i].data + "\"";
+
+            Pin* connectedPin = blendGraph.GetOutputConnectedPin(&(node->Inputs[i]));
+
+            if (connectedPin == nullptr) // Not connected to anything
+            {
+                existingTreeStr += "\"animal_var_" + node->Inputs[i].data + "\"";
+            }
+            else
+            {
+                existingTreeStr += "\"" + connectedPin->Node->Inputs[0].data + "\"";
+            }
 
             if (!lastDataEntry)
             {
@@ -2145,7 +2155,9 @@ struct Example :
             //add deepest node (root);
         }
 
-        fout << "}\n";
+        fout << "\t}\n";
+
+        fout << "}";
 
         fout.close();
 
