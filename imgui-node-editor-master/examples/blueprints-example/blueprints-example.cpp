@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <utility>
 #include <unordered_map>
+#include <unordered_set>
 
 //#include <json/json.h>
 //#include <json/value.h>
@@ -312,6 +313,17 @@ struct BlendEditor
     std::unordered_map<int, Pin*> pinIDToPin; // Pin id to pin reference
 
     std::unordered_map<std::string, bool> affectedBones;
+
+
+    Pin* GetOutputConnectedPin(Pin* inputPin)
+    {
+        std::unordered_map<int, Link*>::iterator it = inputPinToLink.find(inputPin->ID.Get());
+
+        if (it == inputPinToLink.end()) return nullptr; // Pin not connected to any link
+
+        Link* link = inputPinToLink[inputPin->ID.Get()];
+        return pinIDToPin[link->StartPinID.Get()];
+    }
 
 
     void InitializeConnectionDataMaps()
@@ -1962,33 +1974,44 @@ struct Example :
         }
     }
 
-    //std::string GetTreeString(Node* node, BlendEditor blendGraph, std::string existingTreeStr = "")
-    //{
-    //    if (node->Name == "Root")
-    //    {
-    //        /*if (node->Inputs[0].Node == nullptr)
-    //        {
-    //            return existingTreeStr;
-    //        }
-    //        else
-    //        {*/
-    //        int i = 0;
-    //        while (blendGraph.m_Links[i].EndPinID != node->Inputs[0].ID) {
-    //            i++;
-    //        }
-    //        int j = 0;
-    //        while (blendGraph.m_Nodes[j].Outputs[0].ID != blendGraph.m_Links[i].StartPinID) {
-    //            j++;
-    //        }
-    //        return GetTreeString(&(blendGraph.m_Nodes[j]), blendGraph, existingTreeStr);
-    //        //return GetTreeString(node->Inputs[0].Node, existingTreeStr);
-    //        //}
-    //    }
-    //    else
-    //    {
-    //        return "";
-    //    }
-    //}
+    std::string GetTreeString(Node* node, BlendEditor blendGraph, std::string existingTreeStr, 
+        std::unordered_set<Node*>& visitedNodes)
+    {
+        if (visitedNodes.find(node) != visitedNodes.end()) return existingTreeStr; // Already visited node, skip
+
+        visitedNodes.insert(node);
+
+        for (int i = 0; i < node->Inputs.size(); i++)
+        {
+            Pin* connectedPin = blendGraph.GetOutputConnectedPin(&(node->Inputs[i]));
+
+            if (connectedPin == nullptr) continue;
+
+            existingTreeStr = GetTreeString(connectedPin->Node, blendGraph, existingTreeStr, visitedNodes);
+        }
+
+        existingTreeStr += node->Name + "\n";
+
+        return existingTreeStr;
+
+
+        /*if (node->Name == "Root")
+        {
+            
+        }
+        else
+        {
+            return "";
+        }*/
+
+        return "";
+    }
+
+    std::string GetTreeString(Node* node, BlendEditor blendGraph)
+    {
+        std::unordered_set<Node*> visitedNodes;
+        return GetTreeString(node, blendGraph, "", visitedNodes);
+    }
 
     bool SaveBlendTreeToJSON()
     {
@@ -2039,14 +2062,14 @@ struct Example :
             fout << std::endl << "\t\t\"node_num\": " + std::to_string(blendEditors[treeIndex].m_Nodes.size()) + "," << std::endl << std::endl;
 
             //Print nodes
-            for (int nodeIndex = 0; nodeIndex < blendEditors[treeIndex].m_Nodes.size(); nodeIndex++) {
-                fout << "\t\t\"";
-                // gotta figure out how to reference nodes in an order that doesnt reference nodes that dont exist yet
-            }
+            //for (int nodeIndex = 0; nodeIndex < blendEditors[treeIndex].m_Nodes.size(); nodeIndex++) {
+            //    fout << "\t\t\"";
+            //    // gotta figure out how to reference nodes in an order that doesnt reference nodes that dont exist yet
+            //}
 
-            /*std::string a = GetTreeString(&(blendEditors[treeIndex].m_Nodes[0]));
-
-            a = "23";*/
+            std::string a = GetTreeString(&(blendEditors[treeIndex].m_Nodes[0]), blendEditors[treeIndex]);
+            fout << a;
+            a = "23";
 
             //add deepest node (root);
         }
