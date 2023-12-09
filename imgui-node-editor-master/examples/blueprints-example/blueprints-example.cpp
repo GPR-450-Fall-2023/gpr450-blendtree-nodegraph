@@ -146,6 +146,7 @@ enum class AnimalVar
     animal_var_idleClipCtrl,
     animal_var_walkClipCtrl,
     animal_var_runClipCtrl,
+    animal_var_idlePistolClipCtrl,
 
     animal_var_ctrlVelocityMagnitude,
     animal_var_idleBlendThreshold,
@@ -171,6 +172,7 @@ const std::string ANIMAL_VAR_NAMES[] =
     "idleClipCtrl",
     "walkClipCtrl",
     "runClipCtrl",
+    "idlePistolClipCtrl",
     "ctrlVelocityMagnitude",
     "idleBlendThreshold",
     "walkBlendThreshold",
