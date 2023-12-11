@@ -1961,6 +1961,8 @@ struct Example :
         }
     }
 
+
+	// Getting rid of loading due to scope
     void ShowLoadWindow()
     {
         // toggles a window that displays the following:
@@ -2962,11 +2964,11 @@ struct Example :
         {
             m_Current = BlendEditorWindow::save;
         }
-        ImGui::SameLine();
-        if (ImGui::Button("Load"))
+        //ImGui::SameLine();
+        /*if (ImGui::Button("Load"))
         {
             m_Current = BlendEditorWindow::load;
-        }
+        }*/
         
 
         //Show Window
