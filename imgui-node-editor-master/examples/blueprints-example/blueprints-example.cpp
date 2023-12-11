@@ -1950,10 +1950,10 @@ struct Example :
         // 2. file name
         // 3. save button (bind to SaveBlendTreeToJSON())
         // 4. show user feedback of fail/success
-        char* cstr = new char[saveData.path.length() + 1];
-        strcpy(cstr, saveData.path.c_str());
-        ImGui::InputText("Save Path", cstr, 127);
-        saveData.path = cstr;
+        //char* cstr = new char[saveData.path.length() + 1];
+        //strcpy(cstr, saveData.path.c_str());
+        //ImGui::InputText("Save Path", cstr, 127);
+        //saveData.path = cstr;
 
         if (ImGui::Button("Save File"))
         {
@@ -2102,8 +2102,8 @@ struct Example :
     {
         std::ofstream fout;
 
-        fout.open("blendtree.json");
-        //fout.open("../../../../../../BlendGraphOutput/blendtree.json");
+        CreateDirectory("BlendGraphOutput", NULL);
+        fout.open("BlendGraphOutput/blendtree.json");
 
         //Failed to save
         if (!fout || fout.fail())
@@ -2155,7 +2155,6 @@ struct Example :
 
             std::string a = GetTreeString(&(blendEditors[treeIndex].m_Nodes[0]), blendEditors[treeIndex]);
             fout << a;
-            a = "23";
 
             //add deepest node (root);
             fout << "\t}\n";
