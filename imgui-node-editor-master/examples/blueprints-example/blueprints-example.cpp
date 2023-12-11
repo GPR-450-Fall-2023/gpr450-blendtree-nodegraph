@@ -2435,8 +2435,8 @@ struct Example :
         node = SpawnRootNode(&blendEditors[1]);         ed::SetNodePosition(node->ID, ImVec2(0, 500));          //0
 
         node = SpawnClipCtrlNode(&blendEditors[1]);     ed::SetNodePosition(node->ID, ImVec2(-1000, 500));      //5
-        node->Inputs[0].data = "upperJumpNode";
-        node->Inputs[1].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_jumpClipCtrl];
+        node->Inputs[0].data = "upperIdlePistolNode";
+        node->Inputs[1].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_idlePistolClipCtrl];
         node->Inputs[2].data = ANIMAL_VAR_NAMES[(int)AnimalVar::animal_var_hierarchyPoseGroup_skel];
 
         //Disable any bones that aren't in the arms/hands
