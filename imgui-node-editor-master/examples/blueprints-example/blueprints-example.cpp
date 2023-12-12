@@ -1981,6 +1981,8 @@ struct Example :
         }
     }
 
+
+	// Converts blend graph to a string
     std::string GetTreeString(Node* node, BlendEditor blendGraph, std::string existingTreeStr, 
         std::unordered_set<Node*>& visitedNodes)
     {
@@ -1988,12 +1990,14 @@ struct Example :
 
         visitedNodes.insert(node);
 
+		// Traverse backwards through tree using links connected to node
         for (int i = 0; i < node->Inputs.size(); i++)
         {
             Pin* connectedPin = blendGraph.GetOutputConnectedPin(&(node->Inputs[i]));
 
             if (connectedPin == nullptr) continue;
 
+			// Recursively visit connected node
             existingTreeStr = GetTreeString(connectedPin->Node, blendGraph, existingTreeStr, visitedNodes);
         }
 
@@ -2022,18 +2026,18 @@ struct Example :
 
         existingTreeStr += "\n";
 
+		// Variables to count how many of each type of variable this node uses
         int numSpatial = 0;
         int numParam = 0;
         int numMisc = 0;
 
         for (int i = 1; i < node->Inputs.size(); i++)
         {
-            //existingTreeStr += node->Inputs[i].data
-
             if (i + 1 >= node->Inputs.size()) lastDataEntry = true;
 
             existingTreeStr += "\t\t\t\"";
 
+			// Write the input and what number it is
             switch (node->Inputs[i].dataGroup)
             {
                 case DataGroup::Spatial:
@@ -2092,11 +2096,13 @@ struct Example :
         return existingTreeStr;
     }
 
+
     std::string GetTreeString(Node* node, BlendEditor blendGraph)
     {
         std::unordered_set<Node*> visitedNodes;
         return GetTreeString(node, blendGraph, "", visitedNodes);
     }
+
 
     bool SaveBlendTreeToJSON()
     {
@@ -2113,6 +2119,7 @@ struct Example :
 
         fout << "{\n";
 
+		// Loop through each blend editor
         for (int treeIndex = 0; treeIndex < blendEditors.size(); treeIndex++)
         {
             blendEditors[treeIndex].InitializeConnectionDataMaps();
@@ -2123,6 +2130,7 @@ struct Example :
             //Print target joint array
             fout << "\t\t\"target_joints\": [" << std::endl;
 
+			// Go through each affected bone and write it to file if blend tree should target it
             for (std::unordered_map<std::string, bool>::iterator it = blendEditors[treeIndex].affectedBones.begin(); it != blendEditors[treeIndex].affectedBones.end(); it++)
             {
                 if (it->second == true)
@@ -2143,8 +2151,9 @@ struct Example :
             //Print number of nodes
             fout << std::endl << "\t\t\"node_num\": " + std::to_string(blendEditors[treeIndex].m_Nodes.size()) + "," << std::endl << std::endl;
 
-            std::string a = GetTreeString(&(blendEditors[treeIndex].m_Nodes[0]), blendEditors[treeIndex]);
-            fout << a;
+			// Write blend tree to file
+            std::string treeString = GetTreeString(&(blendEditors[treeIndex].m_Nodes[0]), blendEditors[treeIndex]);
+            fout << treeString;
 
             //add deepest node (root);
             fout << "\t}";
