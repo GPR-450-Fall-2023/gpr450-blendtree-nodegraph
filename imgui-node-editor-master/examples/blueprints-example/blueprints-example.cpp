@@ -2138,26 +2138,23 @@ struct Example :
                 }
             }
 
-            /*for (int jointIndex = 0; jointIndex < blendEditors[treeIndex].affectedBones.size(); jointIndex++)
-            {
-                fout << "\t\t\t\"" +std::to_string(blendEditors[treeIndex].affectedBones) + "\",\n";
-            }*/
             fout << "\t\t]," << std::endl;
 
             //Print number of nodes
             fout << std::endl << "\t\t\"node_num\": " + std::to_string(blendEditors[treeIndex].m_Nodes.size()) + "," << std::endl << std::endl;
 
-            //Print nodes
-            //for (int nodeIndex = 0; nodeIndex < blendEditors[treeIndex].m_Nodes.size(); nodeIndex++) {
-            //    fout << "\t\t\"";
-            //    // gotta figure out how to reference nodes in an order that doesnt reference nodes that dont exist yet
-            //}
-
             std::string a = GetTreeString(&(blendEditors[treeIndex].m_Nodes[0]), blendEditors[treeIndex]);
             fout << a;
 
             //add deepest node (root);
-            fout << "\t}\n";
+            fout << "\t}";
+
+			if (treeIndex < blendEditors.size() - 1)
+			{
+				fout << ",";
+			}
+
+			fout << "\n";
         }
 
         fout << "}";
